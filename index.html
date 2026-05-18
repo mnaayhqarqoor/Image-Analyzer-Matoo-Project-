@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="Matoo Project - Advanced Image Analyzer with EXIF data extraction, camera support & liquid glass design" />
+  <meta name="description" content="مشروع ماتو - محلل الصور المتقدم: استخراج بيانات EXIF، تحليل الألوان، معلومات الجهاز، والدعم الكامل للكاميرا المباشرة" />
   <meta name="theme-color" content="#6366f1" />
-  <title>Image Analyzer | Matoo Project</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>محلل الصور | مشروع ماتو</title>
   
-  <!-- EXIF Library -->
+  <!-- مكتبة EXIF الخفيفة -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- خطوط جوجل العربية -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
   
   <style>
-    /* ===== BASE RESET & VARIABLES ===== */
+    /* ===== إعادة تعيين الأساس والمتغيرات ===== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     :root {
@@ -26,62 +29,79 @@
       --primary-dark: #4f46e5;
       --secondary: #8b5cf6;
       --accent: #06b6d4;
+      --accent-dark: #0891b2;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
       --dark: #0f172a;
       --darker: #020617;
       --light: #f8fafc;
-      --gray: #64748b;
-      --glass-bg: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
-      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --gray: #94a3b8;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
     }
 
-    @media (prefers-color-scheme: dark) {
+    @media (prefers-color-scheme: light) {
       :root {
         --light: #0f172a;
         --dark: #f8fafc;
+        --glass-bg: rgba(15, 23, 42, 0.7);
       }
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c0a29 100%);
+      font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #0c0a29 70%, #1e1b4b 100%);
       color: var(--light);
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      line-height: 1.6;
     }
 
-    /* ===== LIQUID BACKGROUND ANIMATION ===== */
+    /* ===== خلفية سائلة متحركة ===== */
     .liquid-bg {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
+      z-index: -2;
       overflow: hidden;
+      pointer-events: none;
     }
 
     .liquid-bg::before {
       content: '';
       position: absolute;
-      width: 150%;
-      height: 150%;
-      top: -25%;
-      left: -25%;
-      background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%),
-                  radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 60%),
-                  radial-gradient(ellipse at 20% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 60%);
-      animation: liquidFlow 20s ease-in-out infinite;
-      filter: blur(40px);
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: 
+        radial-gradient(ellipse at 30% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+      animation: liquidFlow 25s ease-in-out infinite alternate;
+      filter: blur(60px);
+      opacity: 0.8;
     }
 
     @keyframes liquidFlow {
-      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-      25% { transform: translate(2%, 2%) rotate(0.5deg) scale(1.02); }
-      50% { transform: translate(-1%, 3%) rotate(-0.3deg) scale(0.98); }
-      75% { transform: translate(3%, -2%) rotate(0.8deg) scale(1.01); }
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      25% { transform: translate(3%, -2%) rotate(1deg) scale(1.03); }
+      50% { transform: translate(-2%, 4%) rotate(-0.5deg) scale(0.97); }
+      75% { transform: translate(4%, 2%) rotate(1.5deg) scale(1.02); }
+      100% { transform: translate(-1%, -3%) rotate(-1deg) scale(1.01); }
     }
 
     .particles {
@@ -89,31 +109,33 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
-        radial-gradient(2px 2px at 40px 70px, rgba(99,102,241,0.4), transparent),
-        radial-gradient(2px 2px at 90px 40px, rgba(139,92,246,0.3), transparent),
-        radial-gradient(2px 2px at 160px 120px, rgba(6,182,212,0.4), transparent);
-      background-size: 200px 200px;
-      animation: float 15s linear infinite;
-      opacity: 0.6;
+        radial-gradient(1.5px 1.5px at 15% 25%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1.5px 1.5px at 35% 65%, rgba(99,102,241,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 65% 15%, rgba(139,92,246,0.4), transparent),
+        radial-gradient(1.5px 1.5px at 85% 45%, rgba(6,182,212,0.5), transparent),
+        radial-gradient(1px 1px at 45% 85%, rgba(255,255,255,0.3), transparent);
+      background-size: 300px 300px;
+      animation: particlesFloat 20s linear infinite;
+      opacity: 0.7;
     }
 
-    @keyframes float {
+    @keyframes particlesFloat {
       0% { transform: translateY(0) translateX(0); }
-      100% { transform: translateY(-200px) translateX(100px); }
+      100% { transform: translateY(-300px) translateX(50px); }
     }
 
-    /* ===== GLASSMORPHISM CARD ===== */
+    /* ===== تأثير الزجاج ===== */
     .glass-card {
       background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
+      border-radius: var(--radius-lg);
       box-shadow: var(--glass-shadow);
       position: relative;
       overflow: hidden;
       transition: var(--transition);
+      will-change: transform;
     }
 
     .glass-card::before {
@@ -123,8 +145,9 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      transition: left 0.6s ease;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      transition: left 0.7s ease;
+      pointer-events: none;
     }
 
     .glass-card:hover::before {
@@ -132,63 +155,104 @@
     }
 
     .glass-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+      border-color: rgba(255, 255, 255, 0.3);
     }
 
-    /* ===== HEADER ===== */
+    /* ===== الهيدر ===== */
     header {
       padding: 1.5rem 2rem;
       text-align: center;
       position: relative;
-      z-index: 10;
+      z-index: 20;
+      animation: fadeInDown 0.6s ease;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.75rem;
+      gap: 1rem;
       margin-bottom: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .logo-icon {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-radius: 16px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-      animation: pulse 2s infinite;
+      font-size: 1.8rem;
+      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
+      animation: pulseGlow 2.5s infinite;
+      position: relative;
     }
 
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
-      50% { box-shadow: 0 10px 40px rgba(139, 92, 246, 0.7); }
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      background: inherit;
+      filter: blur(20px);
+      opacity: 0.6;
+      z-index: -1;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5); }
+      50% { box-shadow: 0 12px 60px rgba(139, 92, 246, 0.8); }
     }
 
     .logo-text {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff, #a5b4fc);
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #c7d2fe 50%, #a5f3fc 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      line-height: 1.2;
     }
 
     .logo-subtitle {
       color: var(--gray);
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 400;
+      margin-top: 0.25rem;
     }
 
-    /* ===== MAIN CONTAINER ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid var(--primary);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-top: 0.75rem;
+      animation: fadeIn 0.8s ease 0.3s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ===== الحاوية الرئيسية ===== */
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 1rem 2rem 3rem;
       display: grid;
@@ -196,84 +260,150 @@
       gap: 2rem;
     }
 
-    @media (min-width: 900px) {
+    @media (min-width: 1100px) {
       .container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1.2fr;
         align-items: start;
       }
     }
 
-    /* ===== UPLOAD SECTION ===== */
+    /* ===== قسم الرفع ===== */
     .upload-section {
       padding: 2rem;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-desc {
+      color: var(--gray);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      line-height: 1.7;
     }
 
     .upload-area {
       border: 2px dashed var(--glass-border);
-      border-radius: 20px;
-      padding: 3rem 2rem;
+      border-radius: var(--radius-md);
+      padding: 2.5rem 1.5rem;
       text-align: center;
       cursor: pointer;
       transition: var(--transition);
       position: relative;
-      min-height: 250px;
+      min-height: 220px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 1rem;
+      background: rgba(255,255,255,0.02);
     }
 
     .upload-area:hover,
     .upload-area.dragover {
       border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.1);
-      transform: scale(1.02);
+      background: rgba(99, 102, 241, 0.08);
+      transform: scale(1.01);
     }
 
     .upload-icon {
-      font-size: 3rem;
+      font-size: 3.5rem;
       color: var(--primary);
       animation: bounce 2s infinite;
+      filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.4));
     }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-12px); }
     }
 
     .upload-text {
-      font-size: 1.1rem;
-      font-weight: 500;
+      font-size: 1.15rem;
+      font-weight: 600;
     }
 
     .upload-hint {
       color: var(--gray);
       font-size: 0.9rem;
+      max-width: 280px;
+    }
+
+    .upload-formats {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .format-tag {
+      background: rgba(255,255,255,0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .btn {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       border: none;
-      padding: 0.875rem 2rem;
-      border-radius: 14px;
-      font-weight: 600;
+      padding: 0.9rem 2.2rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
       font-size: 1rem;
       cursor: pointer;
       transition: var(--transition);
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      gap: 0.6rem;
+      box-shadow: 0 10px 35px rgba(99, 102, 241, 0.45);
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
     }
 
     .btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
+      box-shadow: 0 15px 50px rgba(99, 102, 241, 0.65);
     }
 
     .btn:active {
@@ -281,56 +411,92 @@
     }
 
     .btn-camera {
-      background: linear-gradient(135deg, var(--accent), #0891b2);
-      box-shadow: 0 10px 30px rgba(6, 182, 212, 0.4);
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      box-shadow: 0 10px 35px rgba(6, 182, 212, 0.45);
     }
 
     .btn-camera:hover {
-      box-shadow: 0 15px 40px rgba(6, 182, 212, 0.6);
+      box-shadow: 0 15px 50px rgba(6, 182, 212, 0.65);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--glass-border);
+      color: var(--light);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: var(--primary);
     }
 
     .btn:disabled {
-      opacity: 0.6;
+      opacity: 0.55;
       cursor: not-allowed;
-      transform: none;
+      transform: none !important;
+      box-shadow: none !important;
     }
 
     .hidden-input {
       display: none;
     }
 
-    /* ===== PREVIEW SECTION ===== */
+    /* ===== قسم المعاينة ===== */
     .preview-section {
       padding: 2rem;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      animation: fadeInUp 0.6s ease 0.4s both;
+    }
+
+    .image-wrapper {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: rgba(0,0,0,0.25);
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .image-preview {
       width: 100%;
-      max-height: 300px;
-      border-radius: 16px;
+      max-height: 320px;
       object-fit: contain;
-      background: rgba(0,0,0,0.2);
       display: none;
+      transition: var(--transition);
     }
 
     .image-preview.show {
       display: block;
-      animation: fadeIn 0.4s ease;
+      animation: zoomIn 0.4s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.92); }
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* ===== INFO PANEL ===== */
+    .image-placeholder {
+      text-align: center;
+      color: var(--gray);
+      padding: 2rem;
+    }
+
+    .image-placeholder-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    /* ===== لوحة المعلومات ===== */
     .info-panel {
       display: none;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
     .info-panel.show {
@@ -339,60 +505,139 @@
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(25px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .info-category {
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 1rem;
+    }
+
+    .info-category:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
     .info-title {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
       padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 0.75rem;
+      color: #fff;
+    }
+
+    .info-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--primary), transparent);
     }
 
     .info-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.85rem;
     }
 
     .info-item {
-      background: rgba(255,255,255,0.05);
-      padding: 1rem;
-      border-radius: 12px;
-      border-left: 3px solid var(--primary);
+      background: rgba(255,255,255,0.04);
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-sm);
+      border-right: 3px solid var(--primary);
+      transition: var(--transition);
+    }
+
+    .info-item:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateX(-3px);
     }
 
     .info-label {
       font-size: 0.8rem;
       color: var(--gray);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .info-value {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.95rem;
       word-break: break-word;
+      line-height: 1.4;
     }
 
     .info-value.large {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: var(--accent);
+      font-weight: 800;
     }
 
-    /* ===== CAMERA MODAL ===== */
+    .info-value.success { color: var(--success); }
+    .info-value.warning { color: var(--warning); }
+    .info-value.danger { color: var(--danger); }
+
+    /* ===== شريط الألوان ===== */
+    .color-palette {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .color-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.15);
+      border-color: white;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+
+    .color-swatch::after {
+      content: attr(data-hex);
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: white;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .color-swatch:hover::after {
+      opacity: 1;
+      bottom: -30px;
+    }
+
+    /* ===== نموذج الكاميرا ===== */
     .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.9);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -401,6 +646,7 @@
       visibility: hidden;
       transition: var(--transition);
       padding: 1rem;
+      backdrop-filter: blur(8px);
     }
 
     .modal.active {
@@ -410,11 +656,18 @@
 
     .modal-content {
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       background: var(--dark);
-      border-radius: 24px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+      box-shadow: 0 30px 100px rgba(0,0,0,0.6);
+      animation: modalSlide 0.4s ease;
+      border: 1px solid var(--glass-border);
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .modal-header {
@@ -423,38 +676,45 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.03);
     }
 
     .modal-title {
-      font-weight: 600;
-      font-size: 1.1rem;
+      font-weight: 700;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .modal-close {
       background: none;
       border: none;
       color: var(--gray);
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       cursor: pointer;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: var(--transition);
+      font-weight: 300;
     }
 
     .modal-close:hover {
       background: rgba(255,255,255,0.1);
       color: white;
+      transform: rotate(90deg);
     }
 
     .camera-container {
       position: relative;
       width: 100%;
-      height: 400px;
+      height: 380px;
       background: #000;
+      overflow: hidden;
     }
 
     #camera-video {
@@ -462,78 +722,120 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      transform: scaleX(-1);
+    }
+
+    .camera-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .camera-grid {
+      width: 90%;
+      height: 90%;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+
+    .camera-grid::before,
+    .camera-grid::after {
+      content: '';
+      grid-column: 1 / -1;
+      border-top: 1px dashed rgba(255,255,255,0.4);
+    }
+
+    .camera-grid > * {
+      border-right: 1px dashed rgba(255,255,255,0.4);
+    }
+
+    .camera-grid > *:nth-child(3n) {
+      border-right: none;
     }
 
     .camera-controls {
       padding: 1.25rem;
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      background: var(--darker);
+      align-items: center;
+      gap: 1.5rem;
+      background: rgba(0,0,0,0.3);
     }
 
     .btn-capture {
-      width: 70px;
-      height: 70px;
+      width: 75px;
+      height: 75px;
       border-radius: 50%;
       background: white;
-      border: 4px solid var(--primary);
+      border: 5px solid var(--primary);
       cursor: pointer;
       transition: var(--transition);
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-capture::after {
       content: '';
       position: absolute;
-      width: 54px;
-      height: 54px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       background: var(--primary);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       transition: var(--transition);
     }
 
     .btn-capture:hover::after {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
+      background: var(--primary-dark);
     }
 
     .btn-capture:active::after {
-      width: 50px;
-      height: 50px;
+      width: 52px;
+      height: 52px;
     }
 
-    .btn-switch {
-      background: rgba(255,255,255,0.1);
+    .btn-camera-control {
+      background: rgba(255,255,255,0.12);
       border: none;
       color: white;
-      width: 45px;
-      height: 45px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: var(--transition);
+      font-size: 1.2rem;
+      backdrop-filter: blur(8px);
     }
 
-    .btn-switch:hover {
-      background: rgba(255,255,255,0.2);
-      transform: rotate(180deg);
+    .btn-camera-control:hover {
+      background: rgba(255,255,255,0.25);
+      transform: scale(1.1);
     }
 
     #camera-canvas {
       display: none;
     }
 
-    /* ===== LOADING ===== */
+    /* ===== التحميل والرسائل ===== */
     .loading {
       display: none;
       text-align: center;
-      padding: 2rem;
+      padding: 2rem 1rem;
     }
 
     .loading.show {
@@ -541,256 +843,615 @@
     }
 
     .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(255,255,255,0.2);
+      width: 55px;
+      height: 55px;
+      border: 4px solid rgba(255,255,255,0.15);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
+      margin: 0 auto 1.25rem;
+      position: relative;
+    }
+
+    .spinner::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 3px solid transparent;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite reverse;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* ===== FOOTER ===== */
+    .loading-text {
+      font-weight: 500;
+      color: var(--gray);
+    }
+
+    .loading-subtext {
+      font-size: 0.85rem;
+      color: var(--gray);
+      opacity: 0.8;
+      margin-top: 0.4rem;
+    }
+
+    #message {
+      min-height: 28px;
+      text-align: center;
+      font-weight: 500;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .message-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .message-error {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .message-info {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    /* ===== الحالة الفارغة ===== */
+    #emptyState {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      color: var(--gray);
+      animation: fadeIn 0.5s ease;
+    }
+
+    #emptyState.hidden {
+      display: none;
+    }
+
+    .empty-icon {
+      font-size: 4.5rem;
+      margin-bottom: 1.25rem;
+      opacity: 0.7;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .empty-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--light);
+    }
+
+    .empty-desc {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ===== الفوتر ===== */
     footer {
       text-align: center;
-      padding: 2rem;
+      padding: 2.5rem 2rem 3rem;
       color: var(--gray);
       font-size: 0.9rem;
       position: relative;
       z-index: 10;
+      border-top: 1px solid var(--glass-border);
+      margin-top: 2rem;
+      background: rgba(0,0,0,0.1);
+    }
+
+    footer strong {
+      color: var(--primary);
+      font-weight: 700;
     }
 
     footer a {
-      color: var(--primary);
+      color: var(--accent);
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: var(--transition);
+      position: relative;
+      padding: 0 0.25rem;
     }
 
-    footer a:hover {
-      text-decoration: underline;
+    footer a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: var(--transition);
     }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 899px) {
-      .container {
-        padding: 1rem;
-      }
-      
-      .upload-section,
-      .preview-section {
-        padding: 1.5rem;
-      }
-      
-      .logo-text {
-        font-size: 1.5rem;
-      }
-      
-      .camera-container {
-        height: 300px;
-      }
+    footer a:hover::after {
+      width: 100%;
     }
 
-    @media (max-width: 480px) {
-      header {
-        padding: 1rem;
-      }
-      
-      .logo-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-      }
-      
-      .logo-text {
-        font-size: 1.3rem;
-      }
-      
-      .upload-area {
-        padding: 2rem 1.5rem;
-        min-height: 200px;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 0.75rem 0;
+      flex-wrap: wrap;
     }
 
-    /* ===== UTILITIES ===== */
-    .text-center { text-align: center; }
-    .mt-1 { margin-top: 0.5rem; }
-    .mt-2 { margin-top: 1rem; }
-    .mb-1 { margin-bottom: 0.5rem; }
-    .hidden { display: none !important; }
-    .error { color: #f87171; font-size: 0.9rem; }
-    .success { color: #34d399; font-size: 0.9rem; }
-    
-    /* Scrollbar */
-    ::-webkit-scrollbar {
+    .privacy-note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      line-height: 1.5;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ===== شارة الإصدار ===== */
+    .version-badge {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      padding: 0.4rem 0.9rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      animation: slideInLeft 0.5s ease 1s both;
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .version-dot {
       width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.9); }
+    }
+
+    /* ===== التمرير ===== */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
     }
     ::-webkit-scrollbar-track {
       background: rgba(255,255,255,0.05);
     }
     ::-webkit-scrollbar-thumb {
       background: var(--primary);
-      border-radius: 4px;
+      border-radius: 5px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+
+    /* ===== الاستجابة ===== */
+    @media (max-width: 1099px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .upload-section,
+      .preview-section {
+        padding: 1.75rem;
+      }
+      
+      .logo-text {
+        font-size: 1.7rem;
+      }
+      
+      .camera-container {
+        height: 320px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding: 1rem;
+      }
+      
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+      }
+      
+      .logo-text {
+        font-size: 1.45rem;
+      }
+      
+      .logo-subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .upload-area {
+        padding: 2rem 1.25rem;
+        min-height: 200px;
+      }
+      
+      .upload-icon {
+        font-size: 3rem;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.85rem 1.5rem;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .camera-container {
+        height: 280px;
+      }
+      
+      .camera-controls {
+        gap: 1rem;
+        padding: 1rem;
+      }
+      
+      .btn-capture {
+        width: 65px;
+        height: 65px;
+      }
+      
+      .btn-camera-control {
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+      }
+      
+      footer {
+        padding: 2rem 1.5rem 2.5rem;
+      }
+      
+      .version-badge {
+        bottom: 1rem;
+        left: 1rem;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.7rem;
+      }
+    }
+
+    @media (max-height: 700px) {
+      .camera-container {
+        height: 240px;
+      }
+    }
+
+    /* ===== تحسينات الأداء ===== */
+    .will-change-transform {
+      will-change: transform;
+    }
+    
+    .gpu-accelerated {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
+
+    /* ===== طباعة ===== */
+    @media print {
+      .liquid-bg, .upload-section, .btn, footer, .version-badge {
+        display: none !important;
+      }
+      
+      body {
+        background: white;
+        color: black;
+      }
+      
+      .glass-card {
+        background: white;
+        border: 1px solid #ddd;
+        box-shadow: none;
+      }
+      
+      .info-value {
+        color: black;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Liquid Background -->
+  <!-- الخلفية السائلة -->
   <div class="liquid-bg">
     <div class="particles"></div>
   </div>
 
-  <!-- Header -->
+  <!-- الهيدر -->
   <header>
     <div class="logo">
       <div class="logo-icon">🔍</div>
       <div>
-        <div class="logo-text">Image Analyzer</div>
-        <div class="logo-subtitle">Matoo Project</div>
+        <div class="logo-text">محلل الصور</div>
+        <div class="logo-subtitle">مشروع ماتو</div>
       </div>
+    </div>
+    <div class="badge">
+      ✨ إصدار احترافي • معالجة محلية 100%
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- الحاوية الرئيسية -->
   <main class="container">
-    <!-- Upload Section -->
+    <!-- قسم الرفع -->
     <section class="glass-card upload-section">
-      <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">📤 Upload Image</h2>
-      <p style="color: var(--gray); margin-bottom: 1.5rem;">Analyze any image to extract complete metadata, device info & technical details</p>
+      <h2 class="section-title">📤 رفع الصورة</h2>
+      <p class="section-desc">قم برفع أي صورة لتحليل بياناتها التقنية الكاملة: معلومات الكاميرا، إعدادات التصوير، الألوان، الموقع الجغرافي، والمزيد من التفاصيل الدقيقة</p>
       
-      <div class="upload-area" id="dropZone">
+      <div class="upload-area" id="dropZone" tabindex="0">
         <div class="upload-icon">🖼️</div>
-        <div class="upload-text">Drag & drop an image here</div>
-        <div class="upload-hint">or</div>
-        <button class="btn" id="browseBtn">
-          <span>📁</span> Browse Files
-        </button>
+        <div class="upload-text">اسحب الصورة وأسقطها هنا</div>
+        <div class="upload-hint">أو اضغط للبحث في ملفاتك</div>
+        <div class="upload-formats">
+          <span class="format-tag">JPG</span>
+          <span class="format-tag">PNG</span>
+          <span class="format-tag">WEBP</span>
+          <span class="format-tag">HEIC</span>
+          <span class="format-tag">TIFF</span>
+        </div>
         <input type="file" id="fileInput" class="hidden-input" accept="image/*" />
-        <div class="upload-hint mt-1">Supports: JPG, PNG, WEBP, HEIC</div>
       </div>
       
-      <button class="btn btn-camera" id="cameraBtn">
-        <span>📷</span> Take Photo
+      <div class="btn-group">
+        <button class="btn" id="browseBtn">
+          <span>📁</span> اختيار ملف
+        </button>
+        <button class="btn btn-camera" id="cameraBtn">
+          <span>📷</span> تصوير مباشر
+        </button>
+      </button>
+      
+      <button class="btn btn-outline" id="sampleBtn" style="margin-top: 0.5rem;">
+        <span>🎲</span> تجربة بعينة جاهزة
       </button>
       
       <div class="loading" id="loading">
         <div class="spinner"></div>
-        <div>Analyzing image...</div>
+        <div class="loading-text">جاري تحليل الصورة بدقة...</div>
+        <div class="loading-subtext">استخراج البيانات الوصفية والمعلومات التقنية</div>
       </div>
       
-      <div id="message" style="min-height: 24px;"></div>
+      <div id="message"></div>
+      
+      <!-- ميزات سريعة -->
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--glass-border);">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; font-size: 0.85rem;">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="color: var(--success);">✓</span>
+            <span>تحليل EXIF كامل</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="color: var(--success);">✓</span>
+            <span>استخراج الألوان</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="color: var(--success);">✓</span>
+            <span>بيانات الموقع الجغرافي</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="color: var(--success);">✓</span>
+            <span>خصوصية تامة</span>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Preview & Info Section -->
+    <!-- قسم المعاينة والمعلومات -->
     <section class="glass-card preview-section">
-      <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">📊 Analysis Results</h2>
-      <p style="color: var(--gray); margin-bottom: 1.5rem;">Complete image metadata and device information</p>
+      <h2 class="section-title">📊 نتائج التحليل</h2>
+      <p class="section-desc">عرض شامل لجميع البيانات التقنية والمعلومات الوصفية المستخرجة من الصورة</p>
       
-      <img id="imagePreview" class="image-preview" alt="Preview" />
-      
-      <div class="info-panel" id="infoPanel">
-        <div class="info-title">🔍 Image Information</div>
-        <div class="info-grid" id="imageInfo"></div>
-        
-        <div class="info-title mt-2">📱 Device & Camera</div>
-        <div class="info-grid" id="deviceInfo"></div>
-        
-        <div class="info-title mt-2">⚙️ Technical Details</div>
-        <div class="info-grid" id="technicalInfo"></div>
+      <div class="image-wrapper">
+        <img id="imagePreview" class="image-preview" alt="معاينة الصورة" />
+        <div id="imagePlaceholder" class="image-placeholder">
+          <div class="image-placeholder-icon">🔎</div>
+          <div>قم برفع أو تصوير صورة لعرض نتائج التحليل</div>
+        </div>
       </div>
       
-      <div id="emptyState" style="text-align: center; padding: 2rem; color: var(--gray);">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">🔎</div>
-        <div>Upload or capture an image to see analysis results</div>
+      <div class="info-panel" id="infoPanel">
+        <!-- معلومات الصورة الأساسية -->
+        <div class="info-category">
+          <div class="info-title">🖼️ معلومات الصورة</div>
+          <div class="info-grid" id="imageInfo"></div>
+        </div>
+        
+        <!-- بيانات الكاميرا والجهاز -->
+        <div class="info-category">
+          <div class="info-title">📱 الجهاز والكاميرا</div>
+          <div class="info-grid" id="deviceInfo"></div>
+        </div>
+        
+        <!-- الإعدادات التقنية -->
+        <div class="info-category">
+          <div class="info-title">⚙️ إعدادات التصوير</div>
+          <div class="info-grid" id="technicalInfo"></div>
+        </div>
+        
+        <!-- تحليل الألوان -->
+        <div class="info-category">
+          <div class="info-title">🎨 تحليل الألوان</div>
+          <div class="info-grid" id="colorInfo">
+            <div class="info-item" style="grid-column: 1 / -1;">
+              <div class="info-label">الألوان المهيمنة</div>
+              <div class="color-palette" id="colorPalette"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- البيانات الجغرافية والوقت -->
+        <div class="info-category">
+          <div class="info-title">🌍 الوقت والموقع</div>
+          <div class="info-grid" id="locationInfo"></div>
+        </div>
+        
+        <!-- بيانات إضافية -->
+        <div class="info-category">
+          <div class="info-title">📋 بيانات إضافية</div>
+          <div class="info-grid" id="extraInfo"></div>
+        </div>
+      </div>
+      
+      <div id="emptyState">
+        <div class="empty-icon">✨</div>
+        <div class="empty-title">جاهز للتحليل!</div>
+        <div class="empty-desc">اختر صورة من جهازك أو صوّر مباشرة لتحصل على تحليل احترافي وشامل لجميع بياناتها التقنية</div>
+      </div>
+      
+      <!-- أزرار الإجراءات -->
+      <div id="actionButtons" style="display: none; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+        <button class="btn btn-outline" id="downloadReport" style="flex: 1; min-width: 140px;">
+          <span>📥</span> تحميل التقرير
+        </button>
+        <button class="btn btn-outline" id="copyData" style="flex: 1; min-width: 140px;">
+          <span>📋</span> نسخ البيانات
+        </button>
+        <button class="btn btn-outline" id="resetBtn" style="flex: 1; min-width: 140px;">
+          <span>🔄</span> تحليل جديد
+        </button>
       </div>
     </section>
   </main>
 
-  <!-- Camera Modal -->
-  <div class="modal" id="cameraModal">
+  <!-- نموذج الكاميرا -->
+  <div class="modal" id="cameraModal" role="dialog" aria-modal="true" aria-labelledby="cameraModalTitle">
     <div class="modal-content glass-card">
       <div class="modal-header">
-        <div class="modal-title">📷 Camera Capture</div>
-        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal-title" id="cameraModalTitle">📷 التصوير المباشر</div>
+        <button class="modal-close" id="modalClose" aria-label="إغلاق">&times;</button>
       </div>
       <div class="camera-container">
-        <video id="camera-video" autoplay playsinline></video>
+        <video id="camera-video" autoplay playsinline muted></video>
         <canvas id="camera-canvas"></canvas>
+        <div class="camera-overlay">
+          <div class="camera-grid"></div>
+        </div>
       </div>
       <div class="camera-controls">
-        <button class="btn-switch" id="switchCamera" title="Switch Camera">🔄</button>
-        <button class="btn-capture" id="captureBtn" title="Capture Photo"></button>
-        <button class="btn-switch" id="closeCamera" title="Close">✕</button>
+        <button class="btn-camera-control" id="switchCamera" title="تبديل الكاميرا" aria-label="تبديل الكاميرا">🔄</button>
+        <button class="btn-capture" id="captureBtn" title="التقاط الصورة" aria-label="التقاط الصورة"></button>
+        <button class="btn-camera-control" id="closeCamera" title="إغلاق" aria-label="إغلاق">✕</button>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
+  <!-- الفوتر -->
   <footer>
-    <div>✨ <strong>Matoo Project</strong> - Advanced Image Analyzer</div>
-    <div class="mt-1">
-      Made with ❤️ | 
-      <a href="https://github.com" target="_blank">GitHub</a> | 
-      <a href="#" id="clearData">Clear Data</a>
+    <div>✨ <strong>مشروع ماتو</strong> • محلل الصور المتقدم</div>
+    <div class="footer-links">
+      <a href="#" id="clearData">مسح البيانات</a>
+      <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+      <a href="#" id="aboutBtn">حول المشروع</a>
     </div>
-    <div style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
-      All processing happens in your browser. No images are uploaded to servers.
+    <div class="privacy-note">
+      🔒 جميع عمليات المعالجة تتم داخل متصفحك فقط. لا يتم رفع أي صور أو بيانات إلى خوادم خارجية. خصوصيتك مضمونة 100%
     </div>
   </footer>
 
-  <!-- JavaScript -->
+  <!-- شارة الإصدار -->
+  <div class="version-badge">
+    <span class="version-dot"></span>
+    v2.1 • جاهز
+  </div>
+
+  <!-- كود الجافاسكريبت -->
   <script>
-    // ===== DOM ELEMENTS =====
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const browseBtn = document.getElementById('browseBtn');
-    const cameraBtn = document.getElementById('cameraBtn');
-    const imagePreview = document.getElementById('imagePreview');
-    const infoPanel = document.getElementById('infoPanel');
-    const emptyState = document.getElementById('emptyState');
-    const loading = document.getElementById('loading');
-    const messageEl = document.getElementById('message');
-    const imageInfo = document.getElementById('imageInfo');
-    const deviceInfo = document.getElementById('deviceInfo');
-    const technicalInfo = document.getElementById('technicalInfo');
+    // ===== تعريف المتغيرات والعناصر =====
+    const dom = {
+      dropZone: document.getElementById('dropZone'),
+      fileInput: document.getElementById('fileInput'),
+      browseBtn: document.getElementById('browseBtn'),
+      cameraBtn: document.getElementById('cameraBtn'),
+      sampleBtn: document.getElementById('sampleBtn'),
+      imagePreview: document.getElementById('imagePreview'),
+      imagePlaceholder: document.getElementById('imagePlaceholder'),
+      infoPanel: document.getElementById('infoPanel'),
+      emptyState: document.getElementById('emptyState'),
+      actionButtons: document.getElementById('actionButtons'),
+      loading: document.getElementById('loading'),
+      message: document.getElementById('message'),
+      imageInfo: document.getElementById('imageInfo'),
+      deviceInfo: document.getElementById('deviceInfo'),
+      technicalInfo: document.getElementById('technicalInfo'),
+      colorInfo: document.getElementById('colorInfo'),
+      colorPalette: document.getElementById('colorPalette'),
+      locationInfo: document.getElementById('locationInfo'),
+      extraInfo: document.getElementById('extraInfo'),
+      cameraModal: document.getElementById('cameraModal'),
+      cameraVideo: document.getElementById('camera-video'),
+      cameraCanvas: document.getElementById('camera-canvas'),
+      captureBtn: document.getElementById('captureBtn'),
+      switchCameraBtn: document.getElementById('switchCamera'),
+      modalClose: document.getElementById('modalClose'),
+      closeCameraBtn: document.getElementById('closeCamera'),
+      downloadReport: document.getElementById('downloadReport'),
+      copyData: document.getElementById('copyData'),
+      resetBtn: document.getElementById('resetBtn'),
+      clearData: document.getElementById('clearData'),
+      aboutBtn: document.getElementById('aboutBtn')
+    };
+
+    // حالة التطبيق
+    const state = {
+      currentStream: null,
+      facingMode: 'environment',
+      analysisData: null,
+      isProcessing: false
+    };
+
+    // ===== مستمعات الأحداث =====
+    dom.browseBtn.addEventListener('click', () => dom.fileInput.click());
     
-    // Camera Modal Elements
-    const cameraModal = document.getElementById('cameraModal');
-    const cameraVideo = document.getElementById('camera-video');
-    const cameraCanvas = document.getElementById('camera-canvas');
-    const captureBtn = document.getElementById('captureBtn');
-    const switchCameraBtn = document.getElementById('switchCamera');
-    const modalClose = document.getElementById('modalClose');
-    const closeCameraBtn = document.getElementById('closeCamera');
-    
-    // State
-    let currentStream = null;
-    let facingMode = 'environment'; // 'user' or 'environment'
-    
-    // ===== EVENT LISTENERS =====
-    browseBtn.addEventListener('click', () => fileInput.click());
-    
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files[0]) {
-        handleImage(e.target.files[0]);
-      }
+    dom.fileInput.addEventListener('change', (e) => {
+      if (e.target.files?.[0]) handleImage(e.target.files[0]);
     });
     
-    // Drag & Drop
+    // السحب والإفلات
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, preventDefaults, false);
+      dom.dropZone.addEventListener(eventName, preventDefaults, false);
     });
     
     function preventDefaults(e) {
@@ -799,351 +1460,838 @@
     }
     
     ['dragenter', 'dragover'].forEach(eventName => {
-      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+      dom.dropZone.addEventListener(eventName, () => dom.dropZone.classList.add('dragover'), false);
     });
     
     ['dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+      dom.dropZone.addEventListener(eventName, () => dom.dropZone.classList.remove('dragover'), false);
     });
     
-    dropZone.addEventListener('drop', (e) => {
+    dom.dropZone.addEventListener('drop', (e) => {
       const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
+      if (file?.type?.startsWith('image/')) {
         handleImage(file);
       } else {
-        showMessage('Please drop a valid image file', 'error');
+        showMessage('يرجى اختيار ملف صورة صالح', 'error');
       }
     });
     
-    // Camera Button
-    cameraBtn.addEventListener('click', openCamera);
-    
-    // Modal Controls
-    modalClose.addEventListener('click', closeCamera);
-    closeCameraBtn.addEventListener('click', closeCamera);
-    
-    // Capture Button
-    captureBtn.addEventListener('click', capturePhoto);
-    
-    // Switch Camera
-    switchCameraBtn.addEventListener('click', async () => {
-      facingMode = facingMode === 'user' ? 'environment' : 'user';
-      await startCamera();
+    // دعم لوحة المفاتيح للسحب والإفلات
+    dom.dropZone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        dom.fileInput.click();
+      }
     });
     
-    // Clear Data
-    document.getElementById('clearData').addEventListener('click', (e) => {
-      e.preventDefault();
-      resetUI();
-      showMessage('Data cleared successfully', 'success');
+    // أزرار التحكم
+    dom.cameraBtn.addEventListener('click', openCamera);
+    dom.sampleBtn.addEventListener('click', loadSampleImage);
+    dom.modalClose.addEventListener('click', closeCamera);
+    dom.closeCameraBtn.addEventListener('click', closeCamera);
+    dom.captureBtn.addEventListener('click', capturePhoto);
+    dom.switchCameraBtn.addEventListener('click', toggleCamera);
+    dom.resetBtn.addEventListener('click', resetAnalysis);
+    dom.clearData.addEventListener('click', (e) => { e.preventDefault(); resetAll(); });
+    dom.aboutBtn.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
+    dom.downloadReport.addEventListener('click', downloadReport);
+    dom.copyData.addEventListener('click', copyAnalysisData);
+    
+    // إغلاق النموذج بالنقر خارج المحتوى
+    dom.cameraModal.addEventListener('click', (e) => {
+      if (e.target === dom.cameraModal) closeCamera();
     });
     
-    // ===== CORE FUNCTIONS =====
+    // إغلاق النموذج بمفتاح Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dom.cameraModal.classList.contains('active')) {
+        closeCamera();
+      }
+    });
     
-    function showMessage(text, type = 'info') {
-      messageEl.innerHTML = `<div class="${type}">${text}</div>`;
-      setTimeout(() => {
-        messageEl.innerHTML = '';
-      }, 4000);
+    // ===== الوظائف الأساسية =====
+    
+    function showMessage(text, type = 'info', duration = 4000) {
+      dom.message.textContent = text;
+      dom.message.className = `message-${type}`;
+      if (duration) {
+        setTimeout(() => {
+          if (dom.message.textContent === text) {
+            dom.message.textContent = '';
+            dom.message.className = '';
+          }
+        }, duration);
+      }
     }
     
-    function showLoading(show) {
-      loading.classList.toggle('show', show);
-      browseBtn.disabled = show;
-      cameraBtn.disabled = show;
+    function setLoading(isLoading) {
+      state.isProcessing = isLoading;
+      dom.loading.classList.toggle('show', isLoading);
+      dom.browseBtn.disabled = isLoading;
+      dom.cameraBtn.disabled = isLoading;
+      dom.sampleBtn.disabled = isLoading;
+      dom.fileInput.disabled = isLoading;
     }
     
     function resetUI() {
-      fileInput.value = '';
-      imagePreview.classList.remove('show');
-      imagePreview.src = '';
-      infoPanel.classList.remove('show');
-      emptyState.style.display = 'block';
-      imageInfo.innerHTML = '';
-      deviceInfo.innerHTML = '';
-      technicalInfo.innerHTML = '';
+      dom.fileInput.value = '';
+      dom.imagePreview.classList.remove('show');
+      dom.imagePreview.src = '';
+      dom.imagePlaceholder.style.display = 'flex';
+      dom.infoPanel.classList.remove('show');
+      dom.emptyState.classList.remove('hidden');
+      dom.actionButtons.style.display = 'none';
+      dom.colorPalette.innerHTML = '';
+      clearInfoGrids();
     }
     
+    function clearInfoGrids() {
+      [dom.imageInfo, dom.deviceInfo, dom.technicalInfo, dom.locationInfo, dom.extraInfo].forEach(el => {
+        el.innerHTML = '';
+      });
+    }
+    
+    function showAnalysisUI() {
+      dom.imagePlaceholder.style.display = 'none';
+      dom.imagePreview.classList.add('show');
+      dom.emptyState.classList.add('hidden');
+      dom.infoPanel.classList.add('show');
+      dom.actionButtons.style.display = 'flex';
+    }
+    
+    // ===== معالجة الصورة =====
+    
     async function handleImage(file) {
-      if (!file.type.startsWith('image/')) {
-        showMessage('Please select a valid image file', 'error');
+      if (!file?.type?.startsWith('image/')) {
+        showMessage('يرجى اختيار ملف صورة صالح', 'error');
         return;
       }
       
-      showLoading(true);
+      setLoading(true);
       resetUI();
       
       try {
-        // Display preview
+        // عرض المعاينة
         const imageUrl = URL.createObjectURL(file);
-        imagePreview.src = imageUrl;
-        imagePreview.classList.add('show');
-        emptyState.style.display = 'none';
+        dom.imagePreview.src = imageUrl;
         
-        // Extract EXIF data
-        const exifData = await extractEXIF(imageUrl, file);
+        // استخراج البيانات
+        const exifData = await extractImageMetadata(imageUrl, file);
+        state.analysisData = { file, exifData, imageUrl };
         
-        // Display information
-        displayImageInfo(file, exifData);
-        displayDeviceInfo(exifData);
-        displayTechnicalInfo(file, exifData);
+        // عرض المعلومات
+        displayAllInfo(file, exifData);
+        extractAndDisplayColors(imageUrl);
         
-        infoPanel.classList.add('show');
-        showMessage('Image analyzed successfully!', 'success');
+        showAnalysisUI();
+        showMessage('✅ تم تحليل الصورة بنجاح!', 'success');
         
       } catch (error) {
-        console.error('Analysis error:', error);
-        showMessage('Error analyzing image: ' + error.message, 'error');
+        console.error('خطأ في التحليل:', error);
+        showMessage(`❌ خطأ: ${error.message || 'فشل في تحليل الصورة'}`, 'error');
       } finally {
-        showLoading(false);
+        setLoading(false);
       }
     }
     
-    function extractEXIF(imageUrl, file) {
+    async function extractImageMetadata(imageUrl, file) {
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = function() {
-          const exifData = {};
+        img.crossOrigin = 'anonymous';
+        
+        img.onload = async function() {
+          const data = {
+            // المعلومات الأساسية
+            fileName: file.name,
+            fileSize: formatFileSize(file.size),
+            fileType: file.type.toUpperCase(),
+            mimeType: file.type,
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+            aspectRatio: calculateAspectRatio(img.naturalWidth, img.naturalHeight),
+            megapixels: ((img.naturalWidth * img.naturalHeight) / 1_000_000).toFixed(2),
+            orientation: 'أفقي',
+            
+            // معلومات الألوان (سيتم حسابها لاحقاً)
+            dominantColors: [],
+            
+            // بيانات التاريخ
+            dateModified: new Date(file.lastModified).toLocaleString('ar-EG'),
+            dateCreated: null,
+            dateTaken: null
+          };
           
-          // Basic image info
-          exifData.width = img.naturalWidth;
-          exifData.height = img.naturalHeight;
-          exifData.fileSize = formatFileSize(file.size);
-          exifData.fileName = file.name;
-          exifData.fileType = file.type;
+          // تحديد اتجاه الصورة
+          if (img.naturalHeight > img.naturalWidth) data.orientation = 'عمودي';
+          else if (img.naturalWidth === img.naturalHeight) data.orientation = 'مربع';
           
-          // Try to get EXIF data
+          // محاولة استخراج بيانات EXIF
           if (window.EXIF) {
-            EXIF.getData(img, function() {
-              const allMetaData = EXIF.getAllTags(this);
-              
-              // Extract common EXIF fields
-              const exifFields = {
-                'Make': 'cameraMake',
-                'Model': 'cameraModel',
-                'DateTime': 'dateTimeOriginal',
-                'DateTimeOriginal': 'dateTimeOriginal',
-                'ExposureTime': 'exposureTime',
-                'FNumber': 'fNumber',
-                'ISOSpeedRatings': 'isoSpeed',
-                'FocalLength': 'focalLength',
-                'Flash': 'flash',
-                'WhiteBalance': 'whiteBalance',
-                'Software': 'software',
-                'Artist': 'artist',
-                'Copyright': 'copyright',
-                'GPSLatitude': 'gpsLatitude',
-                'GPSLongitude': 'gpsLongitude',
-                'Orientation': 'orientation'
-              };
-              
-              Object.entries(exifFields).forEach(([exifKey, appKey]) => {
-                if (allMetaData[exifKey] !== undefined) {
-                  exifData[appKey] = allMetaData[exifKey];
-                }
+            try {
+              EXIF.getData(img, function() {
+                const tags = EXIF.getAllTags(this);
+                
+                // استخراج الحقول الشائعة
+                const exifMap = {
+                  'Make': 'cameraMake',
+                  'Model': 'cameraModel', 
+                  'Software': 'software',
+                  'Artist': 'artist',
+                  'Copyright': 'copyright',
+                  'DateTime': 'dateTime',
+                  'DateTimeOriginal': 'dateTimeOriginal',
+                  'DateTimeDigitized': 'dateTimeDigitized',
+                  'ExposureTime': 'exposureTime',
+                  'FNumber': 'fNumber',
+                  'ISOSpeedRatings': 'isoSpeed',
+                  'FocalLength': 'focalLength',
+                  'Flash': 'flash',
+                  'WhiteBalance': 'whiteBalance',
+                  'ExposureMode': 'exposureMode',
+                  'MeteringMode': 'meteringMode',
+                  'ExposureProgram': 'exposureProgram',
+                  'SceneCaptureType': 'sceneCaptureType',
+                  'LensModel': 'lensModel',
+                  'LensMake': 'lensMake',
+                  'GPSLatitude': 'gpsLatitude',
+                  'GPSLongitude': 'gpsLongitude',
+                  'GPSAltitude': 'gpsAltitude',
+                  'GPSLatitudeRef': 'gpsLatRef',
+                  'GPSLongitudeRef': 'gpsLonRef',
+                  'Orientation': 'exifOrientation',
+                  'XResolution': 'xResolution',
+                  'YResolution': 'yResolution',
+                  'ResolutionUnit': 'resolutionUnit',
+                  'ColorSpace': 'colorSpace',
+                  'ExifVersion': 'exifVersion',
+                  'FlashpixVersion': 'flashpixVersion',
+                  'ComponentsConfiguration': 'componentsConfig',
+                  'CompressedBitsPerPixel': 'compressedBitsPerPixel',
+                  'UserComment': 'userComment',
+                  'MakerNote': 'makerNote'
+                };
+                
+                Object.entries(exifMap).forEach(([exifKey, appKey]) => {
+                  if (tags[exifKey] !== undefined) {
+                    data[appKey] = formatExifValue(exifKey, tags[exifKey]);
+                  }
+                });
+                
+                // تنسيق التواريخ
+                if (data.dateTimeOriginal) data.dateTaken = formatDate(data.dateTimeOriginal);
+                if (data.dateTime) data.dateCreated = formatDate(data.dateTime);
+                
+                resolve(data);
               });
-              
-              resolve(exifData);
-            });
+            } catch (e) {
+              console.warn('فشل قراءة EXIF:', e);
+              resolve(data);
+            }
           } else {
-            resolve(exifData);
+            resolve(data);
           }
         };
-        img.onerror = () => resolve({});
+        
+        img.onerror = () => {
+          console.error('فشل تحميل الصورة');
+          resolve({ error: 'فشل تحميل الصورة' });
+        };
+        
         img.src = imageUrl;
       });
     }
     
-    function displayImageInfo(file, exifData) {
-      const items = [
-        { label: 'File Name', value: exifData.fileName || 'Unknown' },
-        { label: 'File Size', value: exifData.fileSize || 'Unknown', large: true },
-        { label: 'Dimensions', value: exifData.width && exifData.height ? `${exifData.width} × ${exifData.height}px` : 'Unknown' },
-        { label: 'Format', value: (file.type || exifData.fileType || 'Unknown').toUpperCase() },
-        { label: 'Orientation', value: exifData.orientation || 'Normal' }
-      ];
+    function formatExifValue(key, value) {
+      if (value === null || value === undefined) return null;
       
-      imageInfo.innerHTML = items.map(item => `
-        <div class="info-item">
-          <div class="info-label">${item.label}</div>
-          <div class="info-value ${item.large ? 'large' : ''}">${item.value}</div>
-        </div>
-      `).join('');
-    }
-    
-    function displayDeviceInfo(exifData) {
-      const items = [
-        { label: 'Camera Make', value: exifData.cameraMake || 'Not available' },
-        { label: 'Camera Model', value: exifData.cameraModel || 'Not available' },
-        { label: 'Software', value: exifData.software || 'Not available' },
-        { label: 'Date Taken', value: formatDate(exifData.dateTimeOriginal) || 'Not available' },
-        { label: 'Artist', value: exifData.artist || '—' },
-        { label: 'Copyright', value: exifData.copyright || '—' }
-      ];
-      
-      deviceInfo.innerHTML = items.map(item => `
-        <div class="info-item">
-          <div class="info-label">${item.label}</div>
-          <div class="info-value">${item.value}</div>
-        </div>
-      `).join('');
-    }
-    
-    function displayTechnicalInfo(file, exifData) {
-      const items = [
-        { label: 'ISO Speed', value: exifData.isoSpeed || 'Auto' },
-        { label: 'Aperture', value: exifData.fNumber ? `f/${exifData.fNumber}` : 'Unknown' },
-        { label: 'Shutter Speed', value: formatExposure(exifData.exposureTime) || 'Unknown' },
-        { label: 'Focal Length', value: exifData.focalLength ? `${exifData.focalLength}mm` : 'Unknown' },
-        { label: 'Flash', value: formatFlash(exifData.flash) || 'Unknown' },
-        { label: 'White Balance', value: exifData.whiteBalance === 0 ? 'Auto' : exifData.whiteBalance === 1 ? 'Manual' : 'Unknown' }
-      ];
-      
-      // Add GPS if available
-      if (exifData.gpsLatitude && exifData.gpsLongitude) {
-        items.push({ 
-          label: 'GPS Location', 
-          value: `${formatGPS(exifData.gpsLatitude)}, ${formatGPS(exifData.gpsLongitude)}` 
-        });
+      // معالجة المصفوفات
+      if (Array.isArray(value)) {
+        if (key === 'GPSLatitude' || key === 'GPSLongitude') {
+          return convertGPSCoordinate(value);
+        }
+        return value.slice(0, 3).join(', ');
       }
       
-      technicalInfo.innerHTML = items.map(item => `
-        <div class="info-item">
-          <div class="info-label">${item.label}</div>
-          <div class="info-value">${item.value}</div>
-        </div>
-      `).join('');
+      // معالجة الأرقام
+      if (typeof value === 'number') {
+        if (key === 'FNumber') return `f/${value}`;
+        if (key === 'FocalLength') return `${value} ملم`;
+        if (key === 'ISOSpeedRatings') return `ISO ${value}`;
+        if (key === 'ExposureTime') return formatExposureTime(value);
+        if (key === 'GPSAltitude') return `${value} متر`;
+        return value;
+      }
+      
+      // معالجة النصوص
+      if (typeof value === 'string') {
+        if (key === 'Flash') return formatFlashValue(value);
+        if (key === 'WhiteBalance') return value === 0 ? 'تلقائي' : 'يدوي';
+        if (key === 'Orientation') return formatOrientation(value);
+        return value;
+      }
+      
+      // معالجة الكسور
+      if (value.numerator !== undefined && value.denominator !== undefined) {
+        if (key === 'ExposureTime') {
+          const exp = value.numerator / value.denominator;
+          return formatExposureTime(exp);
+        }
+        if (key === 'FNumber') return `f/${value.numerator / value.denominator}`;
+        if (key === 'FocalLength') return `${value.numerator / value.denominator} ملم`;
+      }
+      
+      return String(value);
     }
     
-    // ===== CAMERA FUNCTIONS =====
+    function formatExposureTime(value) {
+      if (typeof value === 'string') return value;
+      if (value >= 1) return `${value} ثانية`;
+      const denominator = Math.round(1 / value);
+      return `1/${denominator} ثانية`;
+    }
+    
+    function formatFlashValue(value) {
+      const flashModes = {
+        '0': 'لم يومض',
+        '1': 'يومض',
+        '5': 'يومض + كشف العين الحمراء',
+        '7': 'يومض + كشف العين الحمراء + عودة الضوء',
+        '9': 'يومض + عدم عودة الضوء',
+        '13': 'تشغيل تلقائي + عدم عودة الضوء',
+        '15': 'تشغيل تلقائي + عودة الضوء'
+      };
+      return flashModes[String(value)] || `كود: ${value}`;
+    }
+    
+    function formatOrientation(value) {
+      const orientations = {
+        '1': 'أفقي (عادي)',
+        '2': 'أفقي (معكوس)',
+        '3': 'أفقي (مقلوب 180°)',
+        '4': 'أفقي (معكوس + مقلوب)',
+        '5': 'عمودي (معكوس + دوران 90°)',
+        '6': 'عمودي (دوران 90°)',
+        '7': 'عمودي (معكوس + دوران 270°)',
+        '8': 'عمودي (دوران 270°)'
+      };
+      return orientations[String(value)] || 'غير معروف';
+    }
+    
+    function convertGPSCoordinate(coord) {
+      if (!Array.isArray(coord) || coord.length < 3) return null;
+      try {
+        const degrees = coord[0]?.numerator / coord[0]?.denominator || 0;
+        const minutes = coord[1]?.numerator / coord[1]?.denominator || 0;
+        const seconds = coord[2]?.numerator / coord[2]?.denominator || 0;
+        const decimal = degrees + (minutes / 60) + (seconds / 3600);
+        return decimal.toFixed(6);
+      } catch {
+        return null;
+      }
+    }
+    
+    function formatDate(dateStr) {
+      if (!dateStr) return null;
+      // تنسيق EXIF: YYYY:MM:DD HH:MM:SS
+      const match = dateStr.match(/(\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+      if (match) {
+        const [, y, m, d, h, min, s] = match;
+        return new Date(y, m-1, d, h, min, s).toLocaleString('ar-EG', {
+          year: 'numeric', month: 'long', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      }
+      return dateStr;
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 بايت';
+      const units = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
+    }
+    
+    function calculateAspectRatio(w, h) {
+      const gcd = (a, b) => b ? gcd(b, a % b) : a;
+      const divisor = gcd(w, h);
+      return `${w/divisor}:${h/divisor}`;
+    }
+    
+    // ===== عرض المعلومات =====
+    
+    function displayAllInfo(file, data) {
+      // معلومات الصورة
+      const imageItems = [
+        { label: 'اسم الملف', value: data.fileName },
+        { label: 'الحجم', value: data.fileSize, large: true },
+        { label: 'الأبعاد', value: `${data.width} × ${data.height} بكسل` },
+        { label: 'الدقة', value: `${data.megapixels} ميجابكسل` },
+        { label: 'النسبة', value: data.aspectRatio },
+        { label: 'الاتجاه', value: data.orientation },
+        { label: 'النوع', value: data.fileType },
+        { label: 'تعديل آخر', value: data.dateModified }
+      ];
+      dom.imageInfo.innerHTML = imageItems.map(renderInfoItem).join('');
+      
+      // معلومات الجهاز
+      const deviceItems = [
+        { label: 'الشركة المصنعة', value: data.cameraMake || 'غير متوفر' },
+        { label: 'موديل الكاميرا', value: data.cameraModel || 'غير متوفر' },
+        { label: 'العدسة', value: data.lensModel || data.lensMake || '—' },
+        { label: 'البرنامج', value: data.software || '—' },
+        { label: 'المصور', value: data.artist || '—' },
+        { label: 'حقوق النشر', value: data.copyright || '—' },
+        { label: 'إصدار EXIF', value: data.exifVersion || '—' }
+      ];
+      dom.deviceInfo.innerHTML = deviceItems.map(renderInfoItem).join('');
+      
+      // الإعدادات التقنية
+      const techItems = [
+        { label: 'حساسية ISO', value: data.isoSpeed ? `ISO ${data.isoSpeed}` : 'تلقائي' },
+        { label: 'فتحة العدسة', value: data.fNumber || 'غير معروف' },
+        { label: 'سرعة الغالق', value: data.exposureTime || 'غير معروف' },
+        { label: 'البعد البؤري', value: data.focalLength || 'غير معروف' },
+        { label: 'الفلاش', value: formatFlashValue(data.flash) || 'غير معروف' },
+        { label: 'توازن الأبيض', value: data.whiteBalance === 'تلقائي' ? 'تلقائي' : 'يدوي' },
+        { label: 'وضع التعريض', value: formatExposureMode(data.exposureProgram) || '—' },
+        { label: 'نوع المشهد', value: data.sceneCaptureType || '—' }
+      ];
+      dom.technicalInfo.innerHTML = techItems.map(renderInfoItem).join('');
+      
+      // الموقع والوقت
+      const locationItems = [
+        { label: 'تاريخ التصوير', value: data.dateTaken || data.dateCreated || 'غير متوفر' },
+        { label: 'خط العرض', value: data.gpsLatitude ? `${data.gpsLatitude}° ${data.gpsLatRef || 'N'}` : 'غير متوفر' },
+        { label: 'خط الطول', value: data.gpsLongitude ? `${data.gpsLongitude}° ${data.gpsLonRef || 'E'}` : 'غير متوفر' },
+        { label: 'الارتفاع', value: data.gpsAltitude || '—' }
+      ];
+      dom.locationInfo.innerHTML = locationItems.map(renderInfoItem).join('');
+      
+      // بيانات إضافية
+      const extraItems = [
+        { label: 'مساحة اللون', value: data.colorSpace || 'sRGB' },
+        { label: 'وحدة الدقة', value: data.resolutionUnit || 'بوصة' },
+        { label: 'الدقة الأفقية', value: data.xResolution ? `${data.xResolution} نقطة/بوصة` : '—' },
+        { label: 'الدقة الرأسية', value: data.yResolution ? `${data.yResolution} نقطة/بوصة` : '—' },
+        { label: 'تعليق المستخدم', value: data.userComment || '—' }
+      ];
+      dom.extraInfo.innerHTML = extraItems.map(renderInfoItem).join('');
+    }
+    
+    function renderInfoItem(item) {
+      const valueClass = item.large ? 'large' : item.success ? 'success' : item.warning ? 'warning' : item.danger ? 'danger' : '';
+      return `
+        <div class="info-item">
+          <div class="info-label">${item.label}</div>
+          <div class="info-value ${valueClass}">${item.value}</div>
+        </div>
+      `;
+    }
+    
+    function formatExposureMode(value) {
+      const modes = {
+        '0': 'تلقائي', '1': 'يدوي', '2': 'برنامج تلقائي',
+        '3': 'أولوية الغالق', '4': 'أولوية الفتحة',
+        '5': 'وضع إبداعي', '6': 'وضع المشهد', '7': 'بورتريه',
+        '8': 'مناظر طبيعية', '9': 'ماكرو', '10': 'رياضة'
+      };
+      return modes[String(value)];
+    }
+    
+    // ===== استخراج وعرض الألوان =====
+    
+    async function extractAndDisplayColors(imageUrl) {
+      try {
+        const colors = await getDominantColors(imageUrl);
+        dom.colorPalette.innerHTML = colors.map(color => `
+          <div class="color-swatch" 
+               style="background: ${color}" 
+               data-hex="${color}"
+               title="${color}"
+               onclick="navigator.clipboard?.writeText('${color}'); showMessage('تم نسخ اللون: ${color}', 'success', 2000)">
+          </div>
+        `).join('');
+        
+        // إضافة معلومات إضافية عن الألوان
+        const avgBrightness = calculateAverageBrightness(colors);
+        dom.colorInfo.innerHTML += `
+          <div class="info-item">
+            <div class="info-label">سطوع متوسط</div>
+            <div class="info-value ${avgBrightness > 180 ? '' : avgBrightness > 100 ? 'warning' : 'success'}">
+              ${avgBrightness.toFixed(0)} / 255
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">تناسب الألوان</div>
+            <div class="info-value">${colors.length >= 4 ? 'متنوع' : 'متماسك'}</div>
+          </div>
+        `;
+      } catch (e) {
+        console.warn('فشل استخراج الألوان:', e);
+        dom.colorPalette.innerHTML = '<div style="color: var(--gray); font-size: 0.9rem;">تعذر استخراج الألوان</div>';
+      }
+    }
+    
+    function getDominantColors(imageUrl, sampleSize = 50) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // تصغير الصورة للتحليل السريع
+          const maxSize = 100;
+          const ratio = Math.min(maxSize / img.width, maxSize / img.height, 1);
+          canvas.width = img.width * ratio;
+          canvas.height = img.height * ratio;
+          
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          
+          // عينة عشوائية من البكسلات
+          const colors = [];
+          const step = Math.max(1, Math.floor(imageData.length / 4 / sampleSize));
+          
+          for (let i = 0; i < imageData.length; i += 4 * step) {
+            const r = imageData[i], g = imageData[i+1], b = imageData[i+2];
+            const a = imageData[i+3];
+            if (a > 128) { // تجاهل البكسلات الشفافة
+              colors.push({ r, g, b });
+            }
+          }
+          
+          // تجميع الألوان المتشابهة
+          const clustered = clusterColors(colors, 5);
+          const hexColors = clustered.map(c => rgbToHex(c.r, c.g, c.b));
+          
+          resolve(hexColors);
+        };
+        img.onerror = () => resolve(['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']);
+        img.src = imageUrl;
+      });
+    }
+    
+    function clusterColors(colors, k) {
+      if (colors.length === 0) return [];
+      
+      // خوارزمية مبسطة: اختيار مراكز عشوائية ثم متوسط
+      let centroids = [];
+      const step = Math.floor(colors.length / k);
+      for (let i = 0; i < k && i * step < colors.length; i++) {
+        centroids.push({ ...colors[i * step] });
+      }
+      
+      // تكرار بسيط للتجميع
+      for (let iter = 0; iter < 3; iter++) {
+        const clusters = Array.from({ length: k }, () => []);
+        
+        // تعيين كل لون لأقرب مركز
+        for (const color of colors) {
+          let minDist = Infinity, closest = 0;
+          for (let i = 0; i < centroids.length; i++) {
+            const d = colorDistance(color, centroids[i]);
+            if (d < minDist) { minDist = d; closest = i; }
+          }
+          clusters[closest].push(color);
+        }
+        
+        // تحديث المراكز
+        for (let i = 0; i < k; i++) {
+          if (clusters[i].length > 0) {
+            centroids[i] = {
+              r: Math.round(clusters[i].reduce((s, c) => s + c.r, 0) / clusters[i].length),
+              g: Math.round(clusters[i].reduce((s, c) => s + c.g, 0) / clusters[i].length),
+              b: Math.round(clusters[i].reduce((s, c) => s + c.b, 0) / clusters[i].length)
+            };
+          }
+        }
+      }
+      
+      return centroids;
+    }
+    
+    function colorDistance(c1, c2) {
+      return Math.sqrt(
+        Math.pow(c1.r - c2.r, 2) + 
+        Math.pow(c1.g - c2.g, 2) + 
+        Math.pow(c1.b - c2.b, 2)
+      );
+    }
+    
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => {
+        const hex = Math.min(255, Math.max(0, x)).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      }).join('');
+    }
+    
+    function calculateAverageBrightness(hexColors) {
+      let total = 0;
+      for (const hex of hexColors) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        // صيغة السطوع النسبي
+        total += (0.299 * r + 0.587 * g + 0.114 * b);
+      }
+      return total / hexColors.length;
+    }
+    
+    // ===== وظائف الكاميرا =====
     
     async function openCamera() {
       try {
-        cameraModal.classList.add('active');
+        dom.cameraModal.classList.add('active');
         await startCamera();
+        showMessage('تم تفعيل الكاميرا • اضغط على الدائرة للتصوير', 'info', 3000);
       } catch (error) {
-        console.error('Camera error:', error);
-        showMessage('Camera access denied. Please allow permissions.', 'error');
+        console.error('خطأ الكاميرا:', error);
+        showMessage('❌ تعذر الوصول للكاميرا. تحقق من الأذونات', 'error');
         closeCamera();
       }
     }
     
     async function startCamera() {
-      // Stop existing stream
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
+      if (state.currentStream) {
+        state.currentStream.getTracks().forEach(t => t.stop());
       }
       
-      try {
-        const constraints = {
-          video: {
-            facingMode: facingMode,
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          }
-        };
-        
-        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-        cameraVideo.srcObject = currentStream;
-      } catch (err) {
-        console.error('Camera access error:', err);
-        showMessage('Could not access camera: ' + err.message, 'error');
-      }
+      const constraints = {
+        video: {
+          facingMode: state.facingMode,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      };
+      
+      state.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+      dom.cameraVideo.srcObject = state.currentStream;
+      
+      // انتظار بدء الفيديو
+      await new Promise(resolve => {
+        if (dom.cameraVideo.readyState >= 2) resolve();
+        else dom.cameraVideo.onloadedmetadata = resolve;
+      });
     }
     
-    function capturePhoto() {
-      if (!currentStream) return;
+    async function toggleCamera() {
+      state.facingMode = state.facingMode === 'user' ? 'environment' : 'user';
+      await startCamera();
+    }
+    
+    async function capturePhoto() {
+      if (!state.currentStream) return;
       
-      // Set canvas size to match video
-      cameraCanvas.width = cameraVideo.videoWidth || 1280;
-      cameraCanvas.height = cameraVideo.videoHeight || 720;
+      // إعداد الكانفاس بنفس أبعاد الفيديو
+      const video = dom.cameraVideo;
+      dom.cameraCanvas.width = video.videoWidth || 1280;
+      dom.cameraCanvas.height = video.videoHeight || 720;
       
-      // Draw current video frame to canvas
-      const ctx = cameraCanvas.getContext('2d');
-      ctx.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      const ctx = dom.cameraCanvas.getContext('2d');
       
-      // Convert to blob and handle
-      cameraCanvas.toBlob(async (blob) => {
-        blob.name = `capture_${Date.now()}.jpg`;
+      // رسم الفيديو مع عكس الصورة للكاميرا الأمامية
+      if (state.facingMode === 'user') {
+        ctx.translate(dom.cameraCanvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(video, 0, 0);
+      
+      // تحويل إلى Blob
+      dom.cameraCanvas.toBlob(async (blob) => {
+        blob.name = `matoo_capture_${Date.now()}.jpg`;
         await handleImage(blob);
         closeCamera();
-      }, 'image/jpeg', 0.95);
+      }, 'image/jpeg', 0.92);
     }
     
     function closeCamera() {
-      cameraModal.classList.remove('active');
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-        currentStream = null;
+      dom.cameraModal.classList.remove('active');
+      if (state.currentStream) {
+        state.currentStream.getTracks().forEach(track => track.stop());
+        state.currentStream = null;
       }
-      cameraVideo.srcObject = null;
+      dom.cameraVideo.srcObject = null;
     }
     
-    // ===== UTILITY FUNCTIONS =====
+    // ===== وظائف إضافية =====
     
-    function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-    
-    function formatDate(dateString) {
-      if (!dateString) return null;
-      // EXIF date format: "YYYY:MM:DD HH:MM:SS"
-      const parts = dateString.split(/[\s:]/);
-      if (parts.length >= 6) {
-        const date = new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]);
-        return date.toLocaleString();
+    async function loadSampleImage() {
+      setLoading(true);
+      resetUI();
+      
+      try {
+        // صورة عينة من Unsplash (مجانية للاستخدام)
+        const sampleUrl = 'https://picsum.photos/seed/matoo123/1200/800.jpg';
+        const response = await fetch(sampleUrl);
+        const blob = await response.blob();
+        blob.name = 'sample_image.jpg';
+        
+        await handleImage(blob);
+        showMessage('✅ تم تحميل الصورة العينة وتحليلها', 'success');
+      } catch (error) {
+        showMessage('⚠️ تعذر تحميل الصورة العينة. جرب رفع صورة من جهازك', 'warning');
+      } finally {
+        setLoading(false);
       }
-      return dateString;
     }
     
-    function formatExposure(value) {
-      if (!value) return null;
-      if (typeof value === 'number') {
-        return value >= 1 ? `${value}s` : `1/${Math.round(1/value)}s`;
+    function resetAnalysis() {
+      resetUI();
+      state.analysisData = null;
+      showMessage('🔄 جاهز لتحليل صورة جديدة', 'info', 2000);
+    }
+    
+    function resetAll() {
+      resetAnalysis();
+      localStorage.removeItem('matoo_analysis_history');
+      showMessage('✓ تم مسح جميع البيانات المحفوظة', 'success');
+    }
+    
+    function downloadReport() {
+      if (!state.analysisData) return;
+      
+      const { file, exifData } = state.analysisData;
+      const report = {
+        generated: new Date().toISOString(),
+        app: 'محلل الصور - مشروع ماتو',
+        version: '2.1',
+        file: {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified
+        },
+        metadata: exifData
+      };
+      
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `matoo_report_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showMessage('📥 تم تحميل تقرير التحليل', 'success');
+    }
+    
+    function copyAnalysisData() {
+      if (!state.analysisData) return;
+      
+      const { exifData } = state.analysisData;
+      let text = `📊 تقرير تحليل الصورة - مشروع ماتو\n`;
+      text += `═`.repeat(40) + `\n\n`;
+      
+      // تجميع المعلومات
+      const sections = [
+        { title: '🖼️ معلومات الصورة', data: [
+          ['اسم الملف', exifData.fileName],
+          ['الحجم', exifData.fileSize],
+          ['الأبعاد', `${exifData.width} × ${exifData.height} بكسل`],
+          ['الدقة', `${exifData.megapixels} ميجابكسل`]
+        ]},
+        { title: '📱 الجهاز', data: [
+          ['الكاميرا', `${exifData.cameraMake || ''} ${exifData.cameraModel || ''}`.trim() || 'غير متوفر'],
+          ['العدسة', exifData.lensModel || '—'],
+          ['البرنامج', exifData.software || '—']
+        ]},
+        { title: '⚙️ الإعدادات', data: [
+          ['ISO', exifData.isoSpeed || 'تلقائي'],
+          ['الفتحة', exifData.fNumber || '—'],
+          ['الغالق', exifData.exposureTime || '—'],
+          ['البعد البؤري', exifData.focalLength || '—']
+        ]}
+      ];
+      
+      sections.forEach(section => {
+        text += `${section.title}\n${'-'.repeat(30)}\n`;
+        section.data.forEach(([label, value]) => {
+          if (value && value !== 'غير متوفر' && value !== '—') {
+            text += `• ${label}: ${value}\n`;
+          }
+        });
+        text += `\n`;
+      });
+      
+      text += `\n🔗 محلل الصور | مشروع ماتو`;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        showMessage('📋 تم نسخ البيانات للحافظة', 'success');
+      }).catch(() => {
+        showMessage('❌ فشل النسخ. حاول يدوياً', 'error');
+      });
+    }
+    
+    function showAbout() {
+      const aboutText = `
+✨ محلل الصور - مشروع ماتو ✨
+
+الإصدار: 2.1
+النوع: تطبيق ويب تقدمي (PWA)
+
+🔹 الميزات:
+• استخراج كامل لبيانات EXIF
+• تحليل الألوان المهيمنة
+• دعم الكاميرا المباشرة
+• معالجة محلية 100% (بدون رفع للسيرفر)
+• تصميم زجاجي سائل متجاوب
+• دعم كامل للغة العربية
+
+🔹 الخصوصية:
+جميع العمليات تتم داخل متصفحك فقط.
+لا يتم إرسال أي بيانات أو صور للخوادم.
+
+🔹 التوافق:
+✓ جميع المتصفحات الحديثة
+✓ الهواتف والأجهزة اللوحية
+✓ أجهزة الحاسوب
+
+📦 مشروع مفتوح المصدر على GitHub
+
+شكراً لاستخدامك مشروع ماتو! ❤️
+      `;
+      alert(aboutText);
+    }
+    
+    // ===== التهيئة الأولية =====
+    
+    function init() {
+      // التحقق من دعم الكاميرا
+      if (!navigator.mediaDevices?.getUserMedia) {
+        dom.cameraBtn.disabled = true;
+        dom.cameraBtn.title = 'الكاميرا غير مدعومة في هذا المتصفح';
+        dom.cameraBtn.innerHTML = '<span>⚠️</span> الكاميرا غير مدعومة';
       }
-      return value;
-    }
-    
-    function formatFlash(value) {
-      if (value === undefined) return null;
-      return value === 0 ? 'No Flash' : value === 1 ? 'Fired' : `Code: ${value}`;
-    }
-    
-    function formatGPS(coord) {
-      if (!Array.isArray(coord) || coord.length < 3) return null;
-      // Simplified GPS formatting
-      return coord[0] + (coord[1] ? `°${coord[1]}'` : '') + (coord[2] ? `${coord[2]}"` : '');
-    }
-    
-    // ===== INITIALIZATION =====
-    
-    // Check for camera support
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      cameraBtn.disabled = true;
-      cameraBtn.title = 'Camera not supported in this browser';
-    }
-    
-    // Handle page visibility to stop camera when tab is hidden
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
+      
+      // التحقق من دعم EXIF
+      if (!window.EXIF) {
+        console.warn('مكتبة EXIF غير محملة. بعض البيانات قد لا تظهر.');
       }
-    });
+      
+      // تحسين الأداء: إيقاف الكاميرا عند إخفاء التبويب
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && state.currentStream) {
+          state.currentStream.getTracks().forEach(t => t.stop());
+        }
+      });
+      
+      // تسجيل التحميل الناجح
+      console.log('✨ محلل الصور - مشروع ماتو | جاهز للعمل');
+      console.log('🔗 انشر على: https://اسم-المستخدم.github.io/matoo-project');
+    }
     
-    // PWA: Add to home screen prompt (optional enhancement)
+    // تشغيل التهيئة
+    document.addEventListener('DOMContentLoaded', init);
+    
+    // دعم PWA: تثبيت التطبيق
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      // Could show install button here
+      // يمكن إضافة زر "تثبيت التطبيق" هنا
     });
-    
-    console.log('✨ Matoo Project - Image Analyzer Loaded');
-    console.log('🔗 Deploy to GitHub Pages: https://yourusername.github.io/matoo-project');
   </script>
 </body>
 </html>
