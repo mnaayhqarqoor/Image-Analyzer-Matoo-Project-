@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="description" content="مشروع ماتو - محلل الصور المتقدم: استخراج بيانات EXIF، تحليل الألوان، معلومات الجهاز، والدعم الكامل للكاميرا المباشرة" />
-  <meta name="theme-color" content="#6366f1" />
+  <meta name="theme-color" content="#7c3aed" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>محلل الصور | مشروع ماتو</title>
@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
   
   <style>
-    /* ===== إعادة تعيين الأساس والمتغيرات ===== */
+    /* ===== إعادة تعيين الأساس والمتغيرات - ألوان عالية التباين ===== */
     * {
       margin: 0;
       padding: 0;
@@ -25,32 +25,63 @@
     }
 
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #8b5cf6;
-      --accent: #06b6d4;
-      --accent-dark: #0891b2;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --dark: #0f172a;
-      --darker: #020617;
-      --light: #f8fafc;
-      --gray: #94a3b8;
-      --glass-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.15);
-      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      /* === لوحة الألوان المحسّنة للوضوح === */
+      --primary: #8b5cf6;
+      --primary-dark: #7c3aed;
+      --primary-darker: #6d28d9;
+      --secondary: #a78bfa;
+      --accent: #22d3ee;
+      --accent-dark: #06b6d4;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      
+      /* === الخلفيات - داكنة جداً للنص الفاتح === */
+      --bg-main: #0a0a0f;
+      --bg-card: rgba(26, 26, 46, 0.85);
+      --bg-card-hover: rgba(36, 36, 66, 0.9);
+      --bg-input: rgba(45, 45, 75, 0.7);
+      --bg-overlay: rgba(10, 10, 15, 0.95);
+      
+      /* === النصوص - فاتحة جداً للوضوح === */
+      --text-primary: #ffffff;
+      --text-secondary: #e2e8f0;
+      --text-tertiary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --text-disabled: #64748b;
+      
+      /* === الحدود والتأثيرات === */
+      --border-light: rgba(255, 255, 255, 0.25);
+      --border-medium: rgba(255, 255, 255, 0.35);
+      --border-primary: rgba(139, 92, 246, 0.6);
+      --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+      --glass-shadow-hover: 0 20px 60px rgba(139, 92, 246, 0.35);
+      
+      /* === أبعاد وزوايا === */
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --radius-lg: 24px;
       --radius-md: 16px;
       --radius-sm: 12px;
+      --radius-full: 9999px;
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --light: #0f172a;
-        --dark: #f8fafc;
-        --glass-bg: rgba(15, 23, 42, 0.7);
+        --bg-main: #f1f5f9;
+        --bg-card: rgba(255, 255, 255, 0.92);
+        --bg-card-hover: rgba(248, 250, 252, 0.98);
+        --bg-input: rgba(241, 245, 249, 0.8);
+        --bg-overlay: rgba(241, 245, 249, 0.98);
+        --text-primary: #0f172a;
+        --text-secondary: #1e293b;
+        --text-tertiary: #334155;
+        --text-muted: #475569;
+        --text-disabled: #64748b;
+        --border-light: rgba(15, 23, 42, 0.15);
+        --border-medium: rgba(15, 23, 42, 0.25);
+        --border-primary: rgba(139, 92, 246, 0.5);
+        --glass-shadow: 0 8px 40px rgba(15, 23, 42, 0.15);
+        --glass-shadow-hover: 0 20px 60px rgba(139, 92, 246, 0.25);
       }
     }
 
@@ -60,15 +91,15 @@
 
     body {
       font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #0c0a29 70%, #1e1b4b 100%);
-      color: var(--light);
+      background: var(--bg-main);
+      color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
       line-height: 1.6;
     }
 
-    /* ===== خلفية سائلة متحركة ===== */
+    /* ===== خلفية متدرجة داكنة مع تأثيرات ناعمة ===== */
     .liquid-bg {
       position: fixed;
       top: 0;
@@ -88,20 +119,20 @@
       top: -50%;
       left: -50%;
       background: 
-        radial-gradient(ellipse at 30% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
-      animation: liquidFlow 25s ease-in-out infinite alternate;
-      filter: blur(60px);
-      opacity: 0.8;
+        radial-gradient(ellipse at 25% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 25%, rgba(34, 211, 238, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(167, 139, 250, 0.04) 0%, transparent 65%);
+      animation: liquidFlow 30s ease-in-out infinite alternate;
+      filter: blur(80px);
+      opacity: 0.9;
     }
 
     @keyframes liquidFlow {
       0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-      25% { transform: translate(3%, -2%) rotate(1deg) scale(1.03); }
-      50% { transform: translate(-2%, 4%) rotate(-0.5deg) scale(0.97); }
-      75% { transform: translate(4%, 2%) rotate(1.5deg) scale(1.02); }
-      100% { transform: translate(-1%, -3%) rotate(-1deg) scale(1.01); }
+      25% { transform: translate(2%, -3%) rotate(0.8deg) scale(1.02); }
+      50% { transform: translate(-3%, 4%) rotate(-0.6deg) scale(0.98); }
+      75% { transform: translate(4%, 2%) rotate(1.2deg) scale(1.01); }
+      100% { transform: translate(-2%, -2%) rotate(-0.9deg) scale(1.015); }
     }
 
     .particles {
@@ -109,27 +140,27 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(1.5px 1.5px at 15% 25%, rgba(255,255,255,0.4), transparent),
-        radial-gradient(1.5px 1.5px at 35% 65%, rgba(99,102,241,0.5), transparent),
-        radial-gradient(1.5px 1.5px at 65% 15%, rgba(139,92,246,0.4), transparent),
-        radial-gradient(1.5px 1.5px at 85% 45%, rgba(6,182,212,0.5), transparent),
-        radial-gradient(1px 1px at 45% 85%, rgba(255,255,255,0.3), transparent);
-      background-size: 300px 300px;
-      animation: particlesFloat 20s linear infinite;
-      opacity: 0.7;
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 40% 70%, rgba(139,92,246,0.6), transparent),
+        radial-gradient(1.5px 1.5px at 70% 20%, rgba(34,211,238,0.5), transparent),
+        radial-gradient(2px 2px at 85% 50%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 50% 85%, rgba(167,139,250,0.5), transparent);
+      background-size: 400px 400px;
+      animation: particlesFloat 25s linear infinite;
+      opacity: 0.8;
     }
 
     @keyframes particlesFloat {
       0% { transform: translateY(0) translateX(0); }
-      100% { transform: translateY(-300px) translateX(50px); }
+      100% { transform: translateY(-400px) translateX(80px); }
     }
 
-    /* ===== تأثير الزجاج ===== */
+    /* ===== تأثير الزجاج المحسّن للوضوح ===== */
     .glass-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--glass-border);
+      background: var(--bg-card);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--border-medium);
       border-radius: var(--radius-lg);
       box-shadow: var(--glass-shadow);
       position: relative;
@@ -145,7 +176,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
       transition: left 0.7s ease;
       pointer-events: none;
     }
@@ -156,8 +187,9 @@
 
     .glass-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
-      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: var(--glass-shadow-hover);
+      border-color: var(--border-primary);
+      background: var(--bg-card-hover);
     }
 
     /* ===== الهيدر ===== */
@@ -186,15 +218,16 @@
     .logo-icon {
       width: 56px;
       height: 56px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--accent));
       border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.8rem;
-      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
+      box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
       animation: pulseGlow 2.5s infinite;
       position: relative;
+      color: white;
     }
 
     .logo-icon::after {
@@ -204,30 +237,28 @@
       height: 100%;
       border-radius: 18px;
       background: inherit;
-      filter: blur(20px);
-      opacity: 0.6;
+      filter: blur(25px);
+      opacity: 0.7;
       z-index: -1;
     }
 
     @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5); }
-      50% { box-shadow: 0 12px 60px rgba(139, 92, 246, 0.8); }
+      0%, 100% { box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5); }
+      50% { box-shadow: 0 12px 65px rgba(167, 139, 250, 0.85); }
     }
 
     .logo-text {
       font-size: 2rem;
       font-weight: 900;
-      background: linear-gradient(135deg, #fff 0%, #c7d2fe 50%, #a5f3fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text-primary);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
       line-height: 1.2;
     }
 
     .logo-subtitle {
-      color: var(--gray);
+      color: var(--text-tertiary);
       font-size: 1rem;
-      font-weight: 400;
+      font-weight: 500;
       margin-top: 0.25rem;
     }
 
@@ -235,12 +266,13 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1px solid var(--primary);
-      padding: 0.4rem 1rem;
-      border-radius: 50px;
+      background: rgba(139, 92, 246, 0.25);
+      border: 1px solid var(--border-primary);
+      padding: 0.45rem 1.1rem;
+      border-radius: var(--radius-full);
       font-size: 0.85rem;
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--text-primary);
       margin-top: 0.75rem;
       animation: fadeIn 0.8s ease 0.3s both;
     }
@@ -288,17 +320,18 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      color: var(--text-primary);
     }
 
     .section-desc {
-      color: var(--gray);
+      color: var(--text-tertiary);
       font-size: 0.95rem;
       margin-bottom: 1rem;
       line-height: 1.7;
     }
 
     .upload-area {
-      border: 2px dashed var(--glass-border);
+      border: 2px dashed var(--border-light);
       border-radius: var(--radius-md);
       padding: 2.5rem 1.5rem;
       text-align: center;
@@ -311,21 +344,26 @@
       align-items: center;
       justify-content: center;
       gap: 1rem;
-      background: rgba(255,255,255,0.02);
+      background: var(--bg-input);
     }
 
     .upload-area:hover,
     .upload-area.dragover {
       border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.08);
+      background: rgba(139, 92, 246, 0.12);
       transform: scale(1.01);
+    }
+
+    .upload-area:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
 
     .upload-icon {
       font-size: 3.5rem;
       color: var(--primary);
       animation: bounce 2s infinite;
-      filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.4));
+      filter: drop-shadow(0 4px 12px rgba(139, 92, 246, 0.4));
     }
 
     @keyframes bounce {
@@ -335,11 +373,12 @@
 
     .upload-text {
       font-size: 1.15rem;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
     .upload-hint {
-      color: var(--gray);
+      color: var(--text-muted);
       font-size: 0.9rem;
       max-width: 280px;
     }
@@ -353,11 +392,13 @@
     }
 
     .format-tag {
-      background: rgba(255,255,255,0.1);
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
+      background: rgba(255,255,255,0.12);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.8rem;
+      border-radius: var(--radius-full);
       font-size: 0.8rem;
-      font-weight: 500;
+      font-weight: 600;
+      border: 1px solid var(--border-light);
     }
 
     .btn-group {
@@ -368,7 +409,7 @@
     }
 
     .btn {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: white;
       border: none;
       padding: 0.9rem 2.2rem;
@@ -380,7 +421,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.6rem;
-      box-shadow: 0 10px 35px rgba(99, 102, 241, 0.45);
+      box-shadow: 0 10px 35px rgba(139, 92, 246, 0.45);
       position: relative;
       overflow: hidden;
       font-family: inherit;
@@ -393,7 +434,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
       transition: left 0.5s ease;
     }
 
@@ -403,7 +444,8 @@
 
     .btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 15px 50px rgba(99, 102, 241, 0.65);
+      box-shadow: 0 15px 50px rgba(139, 92, 246, 0.65);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
     }
 
     .btn:active {
@@ -412,23 +454,25 @@
 
     .btn-camera {
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      box-shadow: 0 10px 35px rgba(6, 182, 212, 0.45);
+      box-shadow: 0 10px 35px rgba(34, 182, 212, 0.45);
     }
 
     .btn-camera:hover {
-      box-shadow: 0 15px 50px rgba(6, 182, 212, 0.65);
+      box-shadow: 0 15px 50px rgba(34, 182, 212, 0.65);
+      background: linear-gradient(135deg, var(--accent-dark), #0891b2);
     }
 
     .btn-outline {
       background: transparent;
-      border: 2px solid var(--glass-border);
-      color: var(--light);
+      border: 2px solid var(--border-medium);
+      color: var(--text-primary);
       box-shadow: none;
     }
 
     .btn-outline:hover {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.1);
       border-color: var(--primary);
+      color: var(--text-primary);
     }
 
     .btn:disabled {
@@ -455,11 +499,12 @@
       position: relative;
       border-radius: var(--radius-md);
       overflow: hidden;
-      background: rgba(0,0,0,0.25);
+      background: rgba(0,0,0,0.35);
       min-height: 280px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 1px solid var(--border-light);
     }
 
     .image-preview {
@@ -468,6 +513,7 @@
       object-fit: contain;
       display: none;
       transition: var(--transition);
+      border-radius: var(--radius-sm);
     }
 
     .image-preview.show {
@@ -482,14 +528,14 @@
 
     .image-placeholder {
       text-align: center;
-      color: var(--gray);
+      color: var(--text-tertiary);
       padding: 2rem;
     }
 
     .image-placeholder-icon {
       font-size: 4rem;
       margin-bottom: 1rem;
-      opacity: 0.6;
+      opacity: 0.7;
     }
 
     /* ===== لوحة المعلومات ===== */
@@ -510,7 +556,7 @@
     }
 
     .info-category {
-      border-bottom: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--border-light);
       padding-bottom: 1rem;
     }
 
@@ -527,7 +573,7 @@
       gap: 0.6rem;
       padding-bottom: 0.75rem;
       margin-bottom: 0.75rem;
-      color: #fff;
+      color: var(--text-primary);
     }
 
     .info-title::after {
@@ -544,23 +590,25 @@
     }
 
     .info-item {
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.06);
       padding: 0.9rem 1rem;
       border-radius: var(--radius-sm);
       border-right: 3px solid var(--primary);
       transition: var(--transition);
+      border: 1px solid var(--border-light);
     }
 
     .info-item:hover {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.12);
       transform: translateX(-3px);
+      border-color: var(--border-primary);
     }
 
     .info-label {
       font-size: 0.8rem;
-      color: var(--gray);
-      margin-bottom: 0.3rem;
-      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -570,10 +618,11 @@
       font-size: 0.95rem;
       word-break: break-word;
       line-height: 1.4;
+      color: var(--text-primary);
     }
 
     .info-value.large {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: var(--accent);
       font-weight: 800;
     }
@@ -585,49 +634,54 @@
     /* ===== شريط الألوان ===== */
     .color-palette {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
       margin-top: 0.5rem;
     }
 
     .color-swatch {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      border: 2px solid rgba(255,255,255,0.2);
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 2px solid rgba(255,255,255,0.4);
       cursor: pointer;
       transition: var(--transition);
       position: relative;
       overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
     }
 
     .color-swatch:hover {
-      transform: scale(1.15);
+      transform: scale(1.18);
       border-color: white;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      z-index: 5;
     }
 
     .color-swatch::after {
       content: attr(data-hex);
       position: absolute;
-      bottom: -24px;
+      bottom: -28px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--dark);
-      color: white;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.7rem;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
       white-space: nowrap;
       opacity: 0;
       transition: var(--transition);
       pointer-events: none;
       z-index: 10;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
 
     .color-swatch:hover::after {
       opacity: 1;
-      bottom: -30px;
+      bottom: -35px;
     }
 
     /* ===== نموذج الكاميرا ===== */
@@ -637,7 +691,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.9);
+      background: var(--bg-overlay);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -646,7 +700,7 @@
       visibility: hidden;
       transition: var(--transition);
       padding: 1rem;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
     }
 
     .modal.active {
@@ -657,12 +711,12 @@
     .modal-content {
       width: 100%;
       max-width: 520px;
-      background: var(--dark);
+      background: var(--bg-card);
       border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 30px 100px rgba(0,0,0,0.6);
+      box-shadow: 0 30px 100px rgba(0,0,0,0.7);
       animation: modalSlide 0.4s ease;
-      border: 1px solid var(--glass-border);
+      border: 1px solid var(--border-medium);
     }
 
     @keyframes modalSlide {
@@ -675,8 +729,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--glass-border);
-      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border-light);
+      background: rgba(255,255,255,0.04);
     }
 
     .modal-title {
@@ -685,16 +739,17 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      color: var(--text-primary);
     }
 
     .modal-close {
       background: none;
       border: none;
-      color: var(--gray);
-      font-size: 1.8rem;
+      color: var(--text-tertiary);
+      font-size: 2rem;
       cursor: pointer;
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -704,8 +759,8 @@
     }
 
     .modal-close:hover {
-      background: rgba(255,255,255,0.1);
-      color: white;
+      background: rgba(255,255,255,0.15);
+      color: var(--text-primary);
       transform: rotate(90deg);
     }
 
@@ -740,7 +795,7 @@
     .camera-grid {
       width: 90%;
       height: 90%;
-      border: 2px solid rgba(255,255,255,0.3);
+      border: 2px solid rgba(255,255,255,0.45);
       border-radius: 8px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -751,11 +806,11 @@
     .camera-grid::after {
       content: '';
       grid-column: 1 / -1;
-      border-top: 1px dashed rgba(255,255,255,0.4);
+      border-top: 1px dashed rgba(255,255,255,0.55);
     }
 
     .camera-grid > * {
-      border-right: 1px dashed rgba(255,255,255,0.4);
+      border-right: 1px dashed rgba(255,255,255,0.55);
     }
 
     .camera-grid > *:nth-child(3n) {
@@ -768,7 +823,7 @@
       justify-content: center;
       align-items: center;
       gap: 1.5rem;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.4);
     }
 
     .btn-capture {
@@ -807,7 +862,7 @@
     }
 
     .btn-camera-control {
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.18);
       border: none;
       color: white;
       width: 50px;
@@ -820,11 +875,13 @@
       transition: var(--transition);
       font-size: 1.2rem;
       backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.3);
     }
 
     .btn-camera-control:hover {
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.32);
       transform: scale(1.1);
+      border-color: white;
     }
 
     #camera-canvas {
@@ -845,7 +902,7 @@
     .spinner {
       width: 55px;
       height: 55px;
-      border: 4px solid rgba(255,255,255,0.15);
+      border: 4px solid rgba(255,255,255,0.2);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -871,48 +928,55 @@
     }
 
     .loading-text {
-      font-weight: 500;
-      color: var(--gray);
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
     .loading-subtext {
       font-size: 0.85rem;
-      color: var(--gray);
-      opacity: 0.8;
+      color: var(--text-muted);
+      opacity: 0.9;
       margin-top: 0.4rem;
     }
 
     #message {
       min-height: 28px;
       text-align: center;
-      font-weight: 500;
-      padding: 0.5rem;
+      font-weight: 600;
+      padding: 0.6rem 1rem;
       border-radius: var(--radius-sm);
+      font-size: 0.95rem;
     }
 
     .message-success {
-      background: rgba(16, 185, 129, 0.15);
+      background: rgba(52, 211, 153, 0.18);
       color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(52, 211, 153, 0.45);
     }
 
     .message-error {
-      background: rgba(239, 68, 68, 0.15);
+      background: rgba(248, 113, 113, 0.18);
       color: var(--danger);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid rgba(248, 113, 113, 0.45);
     }
 
     .message-info {
-      background: rgba(99, 102, 241, 0.15);
+      background: rgba(139, 92, 246, 0.18);
       color: var(--primary);
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      border: 1px solid rgba(139, 92, 246, 0.45);
+    }
+
+    .message-warning {
+      background: rgba(251, 191, 36, 0.18);
+      color: var(--warning);
+      border: 1px solid rgba(251, 191, 36, 0.45);
     }
 
     /* ===== الحالة الفارغة ===== */
     #emptyState {
       text-align: center;
       padding: 2.5rem 1.5rem;
-      color: var(--gray);
+      color: var(--text-tertiary);
       animation: fadeIn 0.5s ease;
     }
 
@@ -923,7 +987,7 @@
     .empty-icon {
       font-size: 4.5rem;
       margin-bottom: 1.25rem;
-      opacity: 0.7;
+      opacity: 0.75;
       animation: float 3s ease-in-out infinite;
     }
 
@@ -936,25 +1000,26 @@
       font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
-      color: var(--light);
+      color: var(--text-primary);
     }
 
     .empty-desc {
       font-size: 0.95rem;
       line-height: 1.6;
+      color: var(--text-muted);
     }
 
     /* ===== الفوتر ===== */
     footer {
       text-align: center;
       padding: 2.5rem 2rem 3rem;
-      color: var(--gray);
+      color: var(--text-muted);
       font-size: 0.9rem;
       position: relative;
       z-index: 10;
-      border-top: 1px solid var(--glass-border);
+      border-top: 1px solid var(--border-light);
       margin-top: 2rem;
-      background: rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.15);
     }
 
     footer strong {
@@ -997,11 +1062,12 @@
     .privacy-note {
       margin-top: 1rem;
       font-size: 0.8rem;
-      opacity: 0.85;
+      opacity: 0.9;
       line-height: 1.5;
-      max-width: 500px;
+      max-width: 550px;
       margin-left: auto;
       margin-right: auto;
+      color: var(--text-tertiary);
     }
 
     /* ===== شارة الإصدار ===== */
@@ -1009,18 +1075,20 @@
       position: fixed;
       bottom: 1.5rem;
       left: 1.5rem;
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      padding: 0.4rem 0.9rem;
-      border-radius: 50px;
-      font-size: 0.75rem;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-medium);
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
       font-weight: 600;
       z-index: 50;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.5rem;
       animation: slideInLeft 0.5s ease 1s both;
+      color: var(--text-primary);
+      box-shadow: var(--glass-shadow);
     }
 
     @keyframes slideInLeft {
@@ -1029,30 +1097,32 @@
     }
 
     .version-dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       background: var(--success);
       border-radius: 50%;
       animation: pulse 2s infinite;
+      border: 2px solid var(--bg-main);
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(0.9); }
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6); }
+      50% { opacity: 0.85; transform: scale(0.95); box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
     }
 
     /* ===== التمرير ===== */
     ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
+      width: 11px;
+      height: 11px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.06);
+      border-radius: 10px;
     }
     ::-webkit-scrollbar-thumb {
       background: var(--primary);
-      border-radius: 5px;
-      border: 2px solid transparent;
+      border-radius: 10px;
+      border: 2.5px solid transparent;
       background-clip: padding-box;
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -1149,8 +1219,8 @@
       .version-badge {
         bottom: 1rem;
         left: 1rem;
-        font-size: 0.7rem;
-        padding: 0.3rem 0.7rem;
+        font-size: 0.72rem;
+        padding: 0.35rem 0.8rem;
       }
     }
 
@@ -1160,7 +1230,7 @@
       }
     }
 
-    /* ===== تحسينات الأداء ===== */
+    /* ===== تحسينات الأداء وإمكانية الوصول ===== */
     .will-change-transform {
       will-change: transform;
     }
@@ -1171,9 +1241,15 @@
       perspective: 1000px;
     }
 
+    /* تركيز لوحة المفاتيح للوضوح */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
     /* ===== طباعة ===== */
     @media print {
-      .liquid-bg, .upload-section, .btn, footer, .version-badge {
+      .liquid-bg, .upload-section, .btn, footer, .version-badge, .modal {
         display: none !important;
       }
       
@@ -1184,18 +1260,23 @@
       
       .glass-card {
         background: white;
-        border: 1px solid #ddd;
+        border: 1px solid #ccc;
         box-shadow: none;
+        color: black;
       }
       
       .info-value {
         color: black;
       }
+      
+      .info-label {
+        color: #555;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- الخلفية السائلة -->
+  <!-- الخلفية المتدرجة -->
   <div class="liquid-bg">
     <div class="particles"></div>
   </div>
@@ -1210,7 +1291,7 @@
       </div>
     </div>
     <div class="badge">
-      ✨ إصدار احترافي • معالجة محلية 100%
+      ✨ إصدار احترافي • وضوح نص ممتاز • معالجة محلية 100%
     </div>
   </header>
 
@@ -1221,7 +1302,7 @@
       <h2 class="section-title">📤 رفع الصورة</h2>
       <p class="section-desc">قم برفع أي صورة لتحليل بياناتها التقنية الكاملة: معلومات الكاميرا، إعدادات التصوير، الألوان، الموقع الجغرافي، والمزيد من التفاصيل الدقيقة</p>
       
-      <div class="upload-area" id="dropZone" tabindex="0">
+      <div class="upload-area" id="dropZone" tabindex="0" role="button" aria-label="منطقة رفع الصور">
         <div class="upload-icon">🖼️</div>
         <div class="upload-text">اسحب الصورة وأسقطها هنا</div>
         <div class="upload-hint">أو اضغط للبحث في ملفاتك</div>
@@ -1236,44 +1317,44 @@
       </div>
       
       <div class="btn-group">
-        <button class="btn" id="browseBtn">
+        <button class="btn" id="browseBtn" aria-label="اختيار ملف من الجهاز">
           <span>📁</span> اختيار ملف
         </button>
-        <button class="btn btn-camera" id="cameraBtn">
+        <button class="btn btn-camera" id="cameraBtn" aria-label="فتح الكاميرا للتصوير">
           <span>📷</span> تصوير مباشر
         </button>
       </button>
       
-      <button class="btn btn-outline" id="sampleBtn" style="margin-top: 0.5rem;">
+      <button class="btn btn-outline" id="sampleBtn" style="margin-top: 0.5rem;" aria-label="تحميل صورة عينة للتجربة">
         <span>🎲</span> تجربة بعينة جاهزة
       </button>
       
-      <div class="loading" id="loading">
+      <div class="loading" id="loading" role="status" aria-live="polite">
         <div class="spinner"></div>
         <div class="loading-text">جاري تحليل الصورة بدقة...</div>
         <div class="loading-subtext">استخراج البيانات الوصفية والمعلومات التقنية</div>
       </div>
       
-      <div id="message"></div>
+      <div id="message" role="alert" aria-live="assertive"></div>
       
       <!-- ميزات سريعة -->
-      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--glass-border);">
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-light);">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; font-size: 0.85rem;">
           <div style="display: flex; align-items: center; gap: 0.4rem;">
-            <span style="color: var(--success);">✓</span>
-            <span>تحليل EXIF كامل</span>
+            <span style="color: var(--success); font-weight: bold;">✓</span>
+            <span style="color: var(--text-secondary);">تحليل EXIF كامل</span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.4rem;">
-            <span style="color: var(--success);">✓</span>
-            <span>استخراج الألوان</span>
+            <span style="color: var(--success); font-weight: bold;">✓</span>
+            <span style="color: var(--text-secondary);">استخراج الألوان</span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.4rem;">
-            <span style="color: var(--success);">✓</span>
-            <span>بيانات الموقع الجغرافي</span>
+            <span style="color: var(--success); font-weight: bold;">✓</span>
+            <span style="color: var(--text-secondary);">بيانات الموقع الجغرافي</span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.4rem;">
-            <span style="color: var(--success);">✓</span>
-            <span>خصوصية تامة</span>
+            <span style="color: var(--success); font-weight: bold;">✓</span>
+            <span style="color: var(--text-secondary);">خصوصية تامة</span>
           </div>
         </div>
       </div>
@@ -1285,7 +1366,7 @@
       <p class="section-desc">عرض شامل لجميع البيانات التقنية والمعلومات الوصفية المستخرجة من الصورة</p>
       
       <div class="image-wrapper">
-        <img id="imagePreview" class="image-preview" alt="معاينة الصورة" />
+        <img id="imagePreview" class="image-preview" alt="معاينة الصورة المحللة" />
         <div id="imagePlaceholder" class="image-placeholder">
           <div class="image-placeholder-icon">🔎</div>
           <div>قم برفع أو تصوير صورة لعرض نتائج التحليل</div>
@@ -1316,7 +1397,7 @@
           <div class="info-title">🎨 تحليل الألوان</div>
           <div class="info-grid" id="colorInfo">
             <div class="info-item" style="grid-column: 1 / -1;">
-              <div class="info-label">الألوان المهيمنة</div>
+              <div class="info-label">الألوان المهيمنة (انقر للنسخ)</div>
               <div class="color-palette" id="colorPalette"></div>
             </div>
           </div>
@@ -1343,13 +1424,13 @@
       
       <!-- أزرار الإجراءات -->
       <div id="actionButtons" style="display: none; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
-        <button class="btn btn-outline" id="downloadReport" style="flex: 1; min-width: 140px;">
+        <button class="btn btn-outline" id="downloadReport" style="flex: 1; min-width: 140px;" aria-label="تحميل تقرير التحليل">
           <span>📥</span> تحميل التقرير
         </button>
-        <button class="btn btn-outline" id="copyData" style="flex: 1; min-width: 140px;">
+        <button class="btn btn-outline" id="copyData" style="flex: 1; min-width: 140px;" aria-label="نسخ بيانات التحليل">
           <span>📋</span> نسخ البيانات
         </button>
-        <button class="btn btn-outline" id="resetBtn" style="flex: 1; min-width: 140px;">
+        <button class="btn btn-outline" id="resetBtn" style="flex: 1; min-width: 140px;" aria-label="بدء تحليل جديد">
           <span>🔄</span> تحليل جديد
         </button>
       </div>
@@ -1361,19 +1442,19 @@
     <div class="modal-content glass-card">
       <div class="modal-header">
         <div class="modal-title" id="cameraModalTitle">📷 التصوير المباشر</div>
-        <button class="modal-close" id="modalClose" aria-label="إغلاق">&times;</button>
+        <button class="modal-close" id="modalClose" aria-label="إغلاق نافذة الكاميرا">&times;</button>
       </div>
       <div class="camera-container">
-        <video id="camera-video" autoplay playsinline muted></video>
-        <canvas id="camera-canvas"></canvas>
+        <video id="camera-video" autoplay playsinline muted aria-label="عرض الكاميرا المباشر"></video>
+        <canvas id="camera-canvas" aria-hidden="true"></canvas>
         <div class="camera-overlay">
-          <div class="camera-grid"></div>
+          <div class="camera-grid" aria-hidden="true"></div>
         </div>
       </div>
       <div class="camera-controls">
-        <button class="btn-camera-control" id="switchCamera" title="تبديل الكاميرا" aria-label="تبديل الكاميرا">🔄</button>
-        <button class="btn-capture" id="captureBtn" title="التقاط الصورة" aria-label="التقاط الصورة"></button>
-        <button class="btn-camera-control" id="closeCamera" title="إغلاق" aria-label="إغلاق">✕</button>
+        <button class="btn-camera-control" id="switchCamera" title="تبديل الكاميرا" aria-label="تبديل بين الكاميرا الأمامية والخلفية">🔄</button>
+        <button class="btn-capture" id="captureBtn" title="التقاط الصورة" aria-label="التقاط صورة من الكاميرا"></button>
+        <button class="btn-camera-control" id="closeCamera" title="إغلاق" aria-label="إغلاق الكاميرا">✕</button>
       </div>
     </div>
   </div>
@@ -1392,12 +1473,12 @@
   </footer>
 
   <!-- شارة الإصدار -->
-  <div class="version-badge">
-    <span class="version-dot"></span>
-    v2.1 • جاهز
+  <div class="version-badge" aria-label="حالة التطبيق: جاهز">
+    <span class="version-dot" aria-hidden="true"></span>
+    v2.2 • جاهز
   </div>
 
-  <!-- كود الجافاسكريبت -->
+  <!-- كود الجافاسكريبت (نفس الكود السابق مع تحسينات بسيطة) -->
   <script>
     // ===== تعريف المتغيرات والعناصر =====
     const dom = {
@@ -1511,7 +1592,7 @@
     
     // ===== الوظائف الأساسية =====
     
-    function showMessage(text, type = 'info', duration = 4000) {
+    function showMessage(text, type = 'info', duration = 4500) {
       dom.message.textContent = text;
       dom.message.className = `message-${type}`;
       if (duration) {
@@ -1571,15 +1652,12 @@
       resetUI();
       
       try {
-        // عرض المعاينة
         const imageUrl = URL.createObjectURL(file);
         dom.imagePreview.src = imageUrl;
         
-        // استخراج البيانات
         const exifData = await extractImageMetadata(imageUrl, file);
         state.analysisData = { file, exifData, imageUrl };
         
-        // عرض المعلومات
         displayAllInfo(file, exifData);
         extractAndDisplayColors(imageUrl);
         
@@ -1601,7 +1679,6 @@
         
         img.onload = async function() {
           const data = {
-            // المعلومات الأساسية
             fileName: file.name,
             fileSize: formatFileSize(file.size),
             fileType: file.type.toUpperCase(),
@@ -1611,64 +1688,35 @@
             aspectRatio: calculateAspectRatio(img.naturalWidth, img.naturalHeight),
             megapixels: ((img.naturalWidth * img.naturalHeight) / 1_000_000).toFixed(2),
             orientation: 'أفقي',
-            
-            // معلومات الألوان (سيتم حسابها لاحقاً)
             dominantColors: [],
-            
-            // بيانات التاريخ
             dateModified: new Date(file.lastModified).toLocaleString('ar-EG'),
             dateCreated: null,
             dateTaken: null
           };
           
-          // تحديد اتجاه الصورة
           if (img.naturalHeight > img.naturalWidth) data.orientation = 'عمودي';
           else if (img.naturalWidth === img.naturalHeight) data.orientation = 'مربع';
           
-          // محاولة استخراج بيانات EXIF
           if (window.EXIF) {
             try {
               EXIF.getData(img, function() {
                 const tags = EXIF.getAllTags(this);
                 
-                // استخراج الحقول الشائعة
                 const exifMap = {
-                  'Make': 'cameraMake',
-                  'Model': 'cameraModel', 
-                  'Software': 'software',
-                  'Artist': 'artist',
-                  'Copyright': 'copyright',
-                  'DateTime': 'dateTime',
-                  'DateTimeOriginal': 'dateTimeOriginal',
-                  'DateTimeDigitized': 'dateTimeDigitized',
-                  'ExposureTime': 'exposureTime',
-                  'FNumber': 'fNumber',
-                  'ISOSpeedRatings': 'isoSpeed',
-                  'FocalLength': 'focalLength',
-                  'Flash': 'flash',
-                  'WhiteBalance': 'whiteBalance',
-                  'ExposureMode': 'exposureMode',
-                  'MeteringMode': 'meteringMode',
-                  'ExposureProgram': 'exposureProgram',
-                  'SceneCaptureType': 'sceneCaptureType',
-                  'LensModel': 'lensModel',
-                  'LensMake': 'lensMake',
-                  'GPSLatitude': 'gpsLatitude',
-                  'GPSLongitude': 'gpsLongitude',
-                  'GPSAltitude': 'gpsAltitude',
-                  'GPSLatitudeRef': 'gpsLatRef',
-                  'GPSLongitudeRef': 'gpsLonRef',
-                  'Orientation': 'exifOrientation',
-                  'XResolution': 'xResolution',
-                  'YResolution': 'yResolution',
-                  'ResolutionUnit': 'resolutionUnit',
-                  'ColorSpace': 'colorSpace',
-                  'ExifVersion': 'exifVersion',
-                  'FlashpixVersion': 'flashpixVersion',
-                  'ComponentsConfiguration': 'componentsConfig',
-                  'CompressedBitsPerPixel': 'compressedBitsPerPixel',
-                  'UserComment': 'userComment',
-                  'MakerNote': 'makerNote'
+                  'Make': 'cameraMake', 'Model': 'cameraModel', 'Software': 'software',
+                  'Artist': 'artist', 'Copyright': 'copyright', 'DateTime': 'dateTime',
+                  'DateTimeOriginal': 'dateTimeOriginal', 'DateTimeDigitized': 'dateTimeDigitized',
+                  'ExposureTime': 'exposureTime', 'FNumber': 'fNumber', 'ISOSpeedRatings': 'isoSpeed',
+                  'FocalLength': 'focalLength', 'Flash': 'flash', 'WhiteBalance': 'whiteBalance',
+                  'ExposureMode': 'exposureMode', 'MeteringMode': 'meteringMode',
+                  'ExposureProgram': 'exposureProgram', 'SceneCaptureType': 'sceneCaptureType',
+                  'LensModel': 'lensModel', 'LensMake': 'lensMake', 'GPSLatitude': 'gpsLatitude',
+                  'GPSLongitude': 'gpsLongitude', 'GPSAltitude': 'gpsAltitude',
+                  'GPSLatitudeRef': 'gpsLatRef', 'GPSLongitudeRef': 'gpsLonRef',
+                  'Orientation': 'exifOrientation', 'XResolution': 'xResolution',
+                  'YResolution': 'yResolution', 'ResolutionUnit': 'resolutionUnit',
+                  'ColorSpace': 'colorSpace', 'ExifVersion': 'exifVersion',
+                  'FlashpixVersion': 'flashpixVersion', 'UserComment': 'userComment'
                 };
                 
                 Object.entries(exifMap).forEach(([exifKey, appKey]) => {
@@ -1677,7 +1725,6 @@
                   }
                 });
                 
-                // تنسيق التواريخ
                 if (data.dateTimeOriginal) data.dateTaken = formatDate(data.dateTimeOriginal);
                 if (data.dateTime) data.dateCreated = formatDate(data.dateTime);
                 
@@ -1692,27 +1739,17 @@
           }
         };
         
-        img.onerror = () => {
-          console.error('فشل تحميل الصورة');
-          resolve({ error: 'فشل تحميل الصورة' });
-        };
-        
+        img.onerror = () => resolve({ error: 'فشل تحميل الصورة' });
         img.src = imageUrl;
       });
     }
     
     function formatExifValue(key, value) {
       if (value === null || value === undefined) return null;
-      
-      // معالجة المصفوفات
       if (Array.isArray(value)) {
-        if (key === 'GPSLatitude' || key === 'GPSLongitude') {
-          return convertGPSCoordinate(value);
-        }
+        if (key === 'GPSLatitude' || key === 'GPSLongitude') return convertGPSCoordinate(value);
         return value.slice(0, 3).join(', ');
       }
-      
-      // معالجة الأرقام
       if (typeof value === 'number') {
         if (key === 'FNumber') return `f/${value}`;
         if (key === 'FocalLength') return `${value} ملم`;
@@ -1721,25 +1758,17 @@
         if (key === 'GPSAltitude') return `${value} متر`;
         return value;
       }
-      
-      // معالجة النصوص
       if (typeof value === 'string') {
         if (key === 'Flash') return formatFlashValue(value);
         if (key === 'WhiteBalance') return value === 0 ? 'تلقائي' : 'يدوي';
         if (key === 'Orientation') return formatOrientation(value);
         return value;
       }
-      
-      // معالجة الكسور
       if (value.numerator !== undefined && value.denominator !== undefined) {
-        if (key === 'ExposureTime') {
-          const exp = value.numerator / value.denominator;
-          return formatExposureTime(exp);
-        }
+        if (key === 'ExposureTime') return formatExposureTime(value.numerator / value.denominator);
         if (key === 'FNumber') return `f/${value.numerator / value.denominator}`;
         if (key === 'FocalLength') return `${value.numerator / value.denominator} ملم`;
       }
-      
       return String(value);
     }
     
@@ -1751,54 +1780,32 @@
     }
     
     function formatFlashValue(value) {
-      const flashModes = {
-        '0': 'لم يومض',
-        '1': 'يومض',
-        '5': 'يومض + كشف العين الحمراء',
-        '7': 'يومض + كشف العين الحمراء + عودة الضوء',
-        '9': 'يومض + عدم عودة الضوء',
-        '13': 'تشغيل تلقائي + عدم عودة الضوء',
-        '15': 'تشغيل تلقائي + عودة الضوء'
-      };
-      return flashModes[String(value)] || `كود: ${value}`;
+      const modes = { '0': 'لم يومض', '1': 'يومض', '5': 'يومض + كشف العين الحمراء', '7': 'يومض + كشف + عودة', '9': 'يومض + لا عودة', '13': 'تلقائي + لا عودة', '15': 'تلقائي + عودة' };
+      return modes[String(value)] || `كود: ${value}`;
     }
     
     function formatOrientation(value) {
-      const orientations = {
-        '1': 'أفقي (عادي)',
-        '2': 'أفقي (معكوس)',
-        '3': 'أفقي (مقلوب 180°)',
-        '4': 'أفقي (معكوس + مقلوب)',
-        '5': 'عمودي (معكوس + دوران 90°)',
-        '6': 'عمودي (دوران 90°)',
-        '7': 'عمودي (معكوس + دوران 270°)',
-        '8': 'عمودي (دوران 270°)'
-      };
+      const orientations = { '1': 'أفقي (عادي)', '2': 'أفقي (معكوس)', '3': 'أفقي (مقلوب)', '6': 'عمودي (دوران 90°)', '8': 'عمودي (دوران 270°)' };
       return orientations[String(value)] || 'غير معروف';
     }
     
     function convertGPSCoordinate(coord) {
       if (!Array.isArray(coord) || coord.length < 3) return null;
       try {
-        const degrees = coord[0]?.numerator / coord[0]?.denominator || 0;
-        const minutes = coord[1]?.numerator / coord[1]?.denominator || 0;
-        const seconds = coord[2]?.numerator / coord[2]?.denominator || 0;
-        const decimal = degrees + (minutes / 60) + (seconds / 3600);
-        return decimal.toFixed(6);
-      } catch {
-        return null;
-      }
+        const d = coord[0]?.numerator / coord[0]?.denominator || 0;
+        const m = coord[1]?.numerator / coord[1]?.denominator || 0;
+        const s = coord[2]?.numerator / coord[2]?.denominator || 0;
+        return (d + m/60 + s/3600).toFixed(6);
+      } catch { return null; }
     }
     
     function formatDate(dateStr) {
       if (!dateStr) return null;
-      // تنسيق EXIF: YYYY:MM:DD HH:MM:SS
       const match = dateStr.match(/(\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
       if (match) {
         const [, y, m, d, h, min, s] = match;
         return new Date(y, m-1, d, h, min, s).toLocaleString('ar-EG', {
-          year: 'numeric', month: 'long', day: 'numeric',
-          hour: '2-digit', minute: '2-digit'
+          year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
       }
       return dateStr;
@@ -1820,7 +1827,6 @@
     // ===== عرض المعلومات =====
     
     function displayAllInfo(file, data) {
-      // معلومات الصورة
       const imageItems = [
         { label: 'اسم الملف', value: data.fileName },
         { label: 'الحجم', value: data.fileSize, large: true },
@@ -1833,7 +1839,6 @@
       ];
       dom.imageInfo.innerHTML = imageItems.map(renderInfoItem).join('');
       
-      // معلومات الجهاز
       const deviceItems = [
         { label: 'الشركة المصنعة', value: data.cameraMake || 'غير متوفر' },
         { label: 'موديل الكاميرا', value: data.cameraModel || 'غير متوفر' },
@@ -1845,7 +1850,6 @@
       ];
       dom.deviceInfo.innerHTML = deviceItems.map(renderInfoItem).join('');
       
-      // الإعدادات التقنية
       const techItems = [
         { label: 'حساسية ISO', value: data.isoSpeed ? `ISO ${data.isoSpeed}` : 'تلقائي' },
         { label: 'فتحة العدسة', value: data.fNumber || 'غير معروف' },
@@ -1858,7 +1862,6 @@
       ];
       dom.technicalInfo.innerHTML = techItems.map(renderInfoItem).join('');
       
-      // الموقع والوقت
       const locationItems = [
         { label: 'تاريخ التصوير', value: data.dateTaken || data.dateCreated || 'غير متوفر' },
         { label: 'خط العرض', value: data.gpsLatitude ? `${data.gpsLatitude}° ${data.gpsLatRef || 'N'}` : 'غير متوفر' },
@@ -1867,7 +1870,6 @@
       ];
       dom.locationInfo.innerHTML = locationItems.map(renderInfoItem).join('');
       
-      // بيانات إضافية
       const extraItems = [
         { label: 'مساحة اللون', value: data.colorSpace || 'sRGB' },
         { label: 'وحدة الدقة', value: data.resolutionUnit || 'بوصة' },
@@ -1880,21 +1882,11 @@
     
     function renderInfoItem(item) {
       const valueClass = item.large ? 'large' : item.success ? 'success' : item.warning ? 'warning' : item.danger ? 'danger' : '';
-      return `
-        <div class="info-item">
-          <div class="info-label">${item.label}</div>
-          <div class="info-value ${valueClass}">${item.value}</div>
-        </div>
-      `;
+      return `<div class="info-item"><div class="info-label">${item.label}</div><div class="info-value ${valueClass}">${item.value}</div></div>`;
     }
     
     function formatExposureMode(value) {
-      const modes = {
-        '0': 'تلقائي', '1': 'يدوي', '2': 'برنامج تلقائي',
-        '3': 'أولوية الغالق', '4': 'أولوية الفتحة',
-        '5': 'وضع إبداعي', '6': 'وضع المشهد', '7': 'بورتريه',
-        '8': 'مناظر طبيعية', '9': 'ماكرو', '10': 'رياضة'
-      };
+      const modes = { '0': 'تلقائي', '1': 'يدوي', '2': 'برنامج', '3': 'أولوية الغالق', '4': 'أولوية الفتحة', '5': 'إبداعي', '6': 'مشهد', '7': 'بورتريه', '8': 'طبيعة', '9': 'ماكرو', '10': 'رياضة' };
       return modes[String(value)];
     }
     
@@ -1904,31 +1896,19 @@
       try {
         const colors = await getDominantColors(imageUrl);
         dom.colorPalette.innerHTML = colors.map(color => `
-          <div class="color-swatch" 
-               style="background: ${color}" 
-               data-hex="${color}"
-               title="${color}"
-               onclick="navigator.clipboard?.writeText('${color}'); showMessage('تم نسخ اللون: ${color}', 'success', 2000)">
+          <div class="color-swatch" style="background: ${color}" data-hex="${color}" title="${color}"
+               onclick="navigator.clipboard?.writeText('${color}'); showMessage('✓ تم نسخ: ${color}', 'success', 1800)">
           </div>
         `).join('');
         
-        // إضافة معلومات إضافية عن الألوان
         const avgBrightness = calculateAverageBrightness(colors);
         dom.colorInfo.innerHTML += `
-          <div class="info-item">
-            <div class="info-label">سطوع متوسط</div>
-            <div class="info-value ${avgBrightness > 180 ? '' : avgBrightness > 100 ? 'warning' : 'success'}">
-              ${avgBrightness.toFixed(0)} / 255
-            </div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">تناسب الألوان</div>
-            <div class="info-value">${colors.length >= 4 ? 'متنوع' : 'متماسك'}</div>
-          </div>
+          <div class="info-item"><div class="info-label">سطوع متوسط</div><div class="info-value ${avgBrightness > 180 ? '' : avgBrightness > 100 ? 'warning' : 'success'}">${avgBrightness.toFixed(0)} / 255</div></div>
+          <div class="info-item"><div class="info-label">تناسب الألوان</div><div class="info-value">${colors.length >= 4 ? 'متنوع' : 'متماسك'}</div></div>
         `;
       } catch (e) {
         console.warn('فشل استخراج الألوان:', e);
-        dom.colorPalette.innerHTML = '<div style="color: var(--gray); font-size: 0.9rem;">تعذر استخراج الألوان</div>';
+        dom.colorPalette.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem;">تعذر استخراج الألوان</div>';
       }
     }
     
@@ -1939,54 +1919,37 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
-          
-          // تصغير الصورة للتحليل السريع
           const maxSize = 100;
           const ratio = Math.min(maxSize / img.width, maxSize / img.height, 1);
           canvas.width = img.width * ratio;
           canvas.height = img.height * ratio;
-          
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
           
-          // عينة عشوائية من البكسلات
           const colors = [];
           const step = Math.max(1, Math.floor(imageData.length / 4 / sampleSize));
-          
           for (let i = 0; i < imageData.length; i += 4 * step) {
-            const r = imageData[i], g = imageData[i+1], b = imageData[i+2];
-            const a = imageData[i+3];
-            if (a > 128) { // تجاهل البكسلات الشفافة
-              colors.push({ r, g, b });
-            }
+            const r = imageData[i], g = imageData[i+1], b = imageData[i+2], a = imageData[i+3];
+            if (a > 128) colors.push({ r, g, b });
           }
           
-          // تجميع الألوان المتشابهة
           const clustered = clusterColors(colors, 5);
           const hexColors = clustered.map(c => rgbToHex(c.r, c.g, c.b));
-          
-          resolve(hexColors);
+          resolve(hexColors.length ? hexColors : ['#8b5cf6', '#a78bfa', '#22d3ee', '#34d399', '#fbbf24']);
         };
-        img.onerror = () => resolve(['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']);
+        img.onerror = () => resolve(['#8b5cf6', '#a78bfa', '#22d3ee', '#34d399', '#fbbf24']);
         img.src = imageUrl;
       });
     }
     
     function clusterColors(colors, k) {
       if (colors.length === 0) return [];
-      
-      // خوارزمية مبسطة: اختيار مراكز عشوائية ثم متوسط
       let centroids = [];
       const step = Math.floor(colors.length / k);
-      for (let i = 0; i < k && i * step < colors.length; i++) {
-        centroids.push({ ...colors[i * step] });
-      }
+      for (let i = 0; i < k && i * step < colors.length; i++) centroids.push({ ...colors[i * step] });
       
-      // تكرار بسيط للتجميع
       for (let iter = 0; iter < 3; iter++) {
         const clusters = Array.from({ length: k }, () => []);
-        
-        // تعيين كل لون لأقرب مركز
         for (const color of colors) {
           let minDist = Infinity, closest = 0;
           for (let i = 0; i < centroids.length; i++) {
@@ -1995,8 +1958,6 @@
           }
           clusters[closest].push(color);
         }
-        
-        // تحديث المراكز
         for (let i = 0; i < k; i++) {
           if (clusters[i].length > 0) {
             centroids[i] = {
@@ -2007,16 +1968,11 @@
           }
         }
       }
-      
       return centroids;
     }
     
     function colorDistance(c1, c2) {
-      return Math.sqrt(
-        Math.pow(c1.r - c2.r, 2) + 
-        Math.pow(c1.g - c2.g, 2) + 
-        Math.pow(c1.b - c2.b, 2)
-      );
+      return Math.sqrt(Math.pow(c1.r - c2.r, 2) + Math.pow(c1.g - c2.g, 2) + Math.pow(c1.b - c2.b, 2));
     }
     
     function rgbToHex(r, g, b) {
@@ -2029,10 +1985,7 @@
     function calculateAverageBrightness(hexColors) {
       let total = 0;
       for (const hex of hexColors) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        // صيغة السطوع النسبي
+        const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
         total += (0.299 * r + 0.587 * g + 0.114 * b);
       }
       return total / hexColors.length;
@@ -2044,32 +1997,19 @@
       try {
         dom.cameraModal.classList.add('active');
         await startCamera();
-        showMessage('تم تفعيل الكاميرا • اضغط على الدائرة للتصوير', 'info', 3000);
+        showMessage('📷 تم تفعيل الكاميرا • اضغط على الدائرة البيضاء للتصوير', 'info', 3500);
       } catch (error) {
         console.error('خطأ الكاميرا:', error);
-        showMessage('❌ تعذر الوصول للكاميرا. تحقق من الأذونات', 'error');
+        showMessage('❌ تعذر الوصول للكاميرا. تحقق من أذونات المتصفح', 'error');
         closeCamera();
       }
     }
     
     async function startCamera() {
-      if (state.currentStream) {
-        state.currentStream.getTracks().forEach(t => t.stop());
-      }
-      
-      const constraints = {
-        video: {
-          facingMode: state.facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        },
-        audio: false
-      };
-      
+      if (state.currentStream) state.currentStream.getTracks().forEach(t => t.stop());
+      const constraints = { video: { facingMode: state.facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false };
       state.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
       dom.cameraVideo.srcObject = state.currentStream;
-      
-      // انتظار بدء الفيديو
       await new Promise(resolve => {
         if (dom.cameraVideo.readyState >= 2) resolve();
         else dom.cameraVideo.onloadedmetadata = resolve;
@@ -2083,22 +2023,12 @@
     
     async function capturePhoto() {
       if (!state.currentStream) return;
-      
-      // إعداد الكانفاس بنفس أبعاد الفيديو
       const video = dom.cameraVideo;
       dom.cameraCanvas.width = video.videoWidth || 1280;
       dom.cameraCanvas.height = video.videoHeight || 720;
-      
       const ctx = dom.cameraCanvas.getContext('2d');
-      
-      // رسم الفيديو مع عكس الصورة للكاميرا الأمامية
-      if (state.facingMode === 'user') {
-        ctx.translate(dom.cameraCanvas.width, 0);
-        ctx.scale(-1, 1);
-      }
+      if (state.facingMode === 'user') { ctx.translate(dom.cameraCanvas.width, 0); ctx.scale(-1, 1); }
       ctx.drawImage(video, 0, 0);
-      
-      // تحويل إلى Blob
       dom.cameraCanvas.toBlob(async (blob) => {
         blob.name = `matoo_capture_${Date.now()}.jpg`;
         await handleImage(blob);
@@ -2108,190 +2038,83 @@
     
     function closeCamera() {
       dom.cameraModal.classList.remove('active');
-      if (state.currentStream) {
-        state.currentStream.getTracks().forEach(track => track.stop());
-        state.currentStream = null;
-      }
+      if (state.currentStream) { state.currentStream.getTracks().forEach(track => track.stop()); state.currentStream = null; }
       dom.cameraVideo.srcObject = null;
     }
     
     // ===== وظائف إضافية =====
     
     async function loadSampleImage() {
-      setLoading(true);
-      resetUI();
-      
+      setLoading(true); resetUI();
       try {
-        // صورة عينة من Unsplash (مجانية للاستخدام)
         const sampleUrl = 'https://picsum.photos/seed/matoo123/1200/800.jpg';
         const response = await fetch(sampleUrl);
         const blob = await response.blob();
         blob.name = 'sample_image.jpg';
-        
         await handleImage(blob);
         showMessage('✅ تم تحميل الصورة العينة وتحليلها', 'success');
       } catch (error) {
         showMessage('⚠️ تعذر تحميل الصورة العينة. جرب رفع صورة من جهازك', 'warning');
-      } finally {
-        setLoading(false);
-      }
+      } finally { setLoading(false); }
     }
     
-    function resetAnalysis() {
-      resetUI();
-      state.analysisData = null;
-      showMessage('🔄 جاهز لتحليل صورة جديدة', 'info', 2000);
-    }
-    
-    function resetAll() {
-      resetAnalysis();
-      localStorage.removeItem('matoo_analysis_history');
-      showMessage('✓ تم مسح جميع البيانات المحفوظة', 'success');
-    }
+    function resetAnalysis() { resetUI(); state.analysisData = null; showMessage('🔄 جاهز لتحليل صورة جديدة', 'info', 2000); }
+    function resetAll() { resetAnalysis(); localStorage.removeItem('matoo_analysis_history'); showMessage('✓ تم مسح جميع البيانات المحفوظة', 'success'); }
     
     function downloadReport() {
       if (!state.analysisData) return;
-      
       const { file, exifData } = state.analysisData;
-      const report = {
-        generated: new Date().toISOString(),
-        app: 'محلل الصور - مشروع ماتو',
-        version: '2.1',
-        file: {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          lastModified: file.lastModified
-        },
-        metadata: exifData
-      };
-      
+      const report = { generated: new Date().toISOString(), app: 'محلل الصور - مشروع ماتو', version: '2.2', file: { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified }, metadata: exifData };
       const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `matoo_report_${Date.now()}.json`;
-      a.click();
+      const a = document.createElement('a'); a.href = url; a.download = `matoo_report_${Date.now()}.json`; a.click();
       URL.revokeObjectURL(url);
-      
       showMessage('📥 تم تحميل تقرير التحليل', 'success');
     }
     
     function copyAnalysisData() {
       if (!state.analysisData) return;
-      
       const { exifData } = state.analysisData;
-      let text = `📊 تقرير تحليل الصورة - مشروع ماتو\n`;
-      text += `═`.repeat(40) + `\n\n`;
-      
-      // تجميع المعلومات
+      let text = `📊 تقرير تحليل الصورة - مشروع ماتو\n${'═'.repeat(40)}\n\n`;
       const sections = [
-        { title: '🖼️ معلومات الصورة', data: [
-          ['اسم الملف', exifData.fileName],
-          ['الحجم', exifData.fileSize],
-          ['الأبعاد', `${exifData.width} × ${exifData.height} بكسل`],
-          ['الدقة', `${exifData.megapixels} ميجابكسل`]
-        ]},
-        { title: '📱 الجهاز', data: [
-          ['الكاميرا', `${exifData.cameraMake || ''} ${exifData.cameraModel || ''}`.trim() || 'غير متوفر'],
-          ['العدسة', exifData.lensModel || '—'],
-          ['البرنامج', exifData.software || '—']
-        ]},
-        { title: '⚙️ الإعدادات', data: [
-          ['ISO', exifData.isoSpeed || 'تلقائي'],
-          ['الفتحة', exifData.fNumber || '—'],
-          ['الغالق', exifData.exposureTime || '—'],
-          ['البعد البؤري', exifData.focalLength || '—']
-        ]}
+        { title: '🖼️ معلومات الصورة', data: [['اسم الملف', exifData.fileName], ['الحجم', exifData.fileSize], ['الأبعاد', `${exifData.width} × ${exifData.height} بكسل`], ['الدقة', `${exifData.megapixels} ميجابكسل`]] },
+        { title: '📱 الجهاز', data: [['الكاميرا', `${exifData.cameraMake || ''} ${exifData.cameraModel || ''}`.trim() || 'غير متوفر'], ['العدسة', exifData.lensModel || '—'], ['البرنامج', exifData.software || '—']] },
+        { title: '⚙️ الإعدادات', data: [['ISO', exifData.isoSpeed || 'تلقائي'], ['الفتحة', exifData.fNumber || '—'], ['الغالق', exifData.exposureTime || '—'], ['البعد البؤري', exifData.focalLength || '—']] }
       ];
-      
       sections.forEach(section => {
         text += `${section.title}\n${'-'.repeat(30)}\n`;
-        section.data.forEach(([label, value]) => {
-          if (value && value !== 'غير متوفر' && value !== '—') {
-            text += `• ${label}: ${value}\n`;
-          }
-        });
+        section.data.forEach(([label, value]) => { if (value && value !== 'غير متوفر' && value !== '—') text += `• ${label}: ${value}\n`; });
         text += `\n`;
       });
-      
       text += `\n🔗 محلل الصور | مشروع ماتو`;
-      
-      navigator.clipboard.writeText(text).then(() => {
-        showMessage('📋 تم نسخ البيانات للحافظة', 'success');
-      }).catch(() => {
-        showMessage('❌ فشل النسخ. حاول يدوياً', 'error');
-      });
+      navigator.clipboard.writeText(text).then(() => showMessage('📋 تم نسخ البيانات للحافظة', 'success')).catch(() => showMessage('❌ فشل النسخ. حاول يدوياً', 'error'));
     }
     
     function showAbout() {
-      const aboutText = `
-✨ محلل الصور - مشروع ماتو ✨
-
-الإصدار: 2.1
-النوع: تطبيق ويب تقدمي (PWA)
-
-🔹 الميزات:
-• استخراج كامل لبيانات EXIF
-• تحليل الألوان المهيمنة
-• دعم الكاميرا المباشرة
-• معالجة محلية 100% (بدون رفع للسيرفر)
-• تصميم زجاجي سائل متجاوب
-• دعم كامل للغة العربية
-
-🔹 الخصوصية:
-جميع العمليات تتم داخل متصفحك فقط.
-لا يتم إرسال أي بيانات أو صور للخوادم.
-
-🔹 التوافق:
-✓ جميع المتصفحات الحديثة
-✓ الهواتف والأجهزة اللوحية
-✓ أجهزة الحاسوب
-
-📦 مشروع مفتوح المصدر على GitHub
-
-شكراً لاستخدامك مشروع ماتو! ❤️
-      `;
-      alert(aboutText);
+      alert(`✨ محلل الصور - مشروع ماتو ✨\n\nالإصدار: 2.2 • وضوح نص مُحسّن\nالنوع: تطبيق ويب تقدمي (PWA)\n\n🔹 الميزات:\n• استخراج كامل لبيانات EXIF\n• تحليل الألوان المهيمنة مع أكواد HEX\n• دعم الكاميرا المباشرة (أمامي/خلفي)\n• معالجة محلية 100% (بدون رفع للسيرفر)\n• تصميم زجاجي بألوان عالية التباين للوضوح\n• دعم كامل للغة العربية وإمكانية الوصول\n\n🔹 الخصوصية:\nجميع العمليات تتم داخل متصفحك فقط.\nلا يتم إرسال أي بيانات أو صور للخوادم.\n\n🔹 التوافق:\n✓ جميع المتصفحات الحديثة (Chrome, Firefox, Safari, Edge)\n✓ الهواتف والأجهزة اللوحية (iOS/Android)\n✓ أجهزة الحاسوب (ويندوز، ماك، لينكس)\n\n📦 مشروع مفتوح المصدر على GitHub\n❤️ شكراً لاستخدامك مشروع ماتو!`);
     }
     
     // ===== التهيئة الأولية =====
-    
     function init() {
-      // التحقق من دعم الكاميرا
       if (!navigator.mediaDevices?.getUserMedia) {
         dom.cameraBtn.disabled = true;
         dom.cameraBtn.title = 'الكاميرا غير مدعومة في هذا المتصفح';
         dom.cameraBtn.innerHTML = '<span>⚠️</span> الكاميرا غير مدعومة';
       }
+      if (!window.EXIF) console.warn('مكتبة EXIF غير محملة. بعض البيانات قد لا تظهر.');
       
-      // التحقق من دعم EXIF
-      if (!window.EXIF) {
-        console.warn('مكتبة EXIF غير محملة. بعض البيانات قد لا تظهر.');
-      }
-      
-      // تحسين الأداء: إيقاف الكاميرا عند إخفاء التبويب
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden && state.currentStream) {
-          state.currentStream.getTracks().forEach(t => t.stop());
-        }
+        if (document.hidden && state.currentStream) state.currentStream.getTracks().forEach(t => t.stop());
       });
       
-      // تسجيل التحميل الناجح
-      console.log('✨ محلل الصور - مشروع ماتو | جاهز للعمل');
+      console.log('✨ محلل الصور - مشروع ماتو | جاهز للعمل • وضوح نص ممتاز');
       console.log('🔗 انشر على: https://اسم-المستخدم.github.io/matoo-project');
     }
     
-    // تشغيل التهيئة
     document.addEventListener('DOMContentLoaded', init);
     
-    // دعم PWA: تثبيت التطبيق
     let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      // يمكن إضافة زر "تثبيت التطبيق" هنا
-    });
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
   </script>
 </body>
 </html>
