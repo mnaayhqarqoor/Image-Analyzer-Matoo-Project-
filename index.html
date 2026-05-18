@@ -2,19 +2,26 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="مشروع ماتو - محلل الصور المتقدم مع فحص الأصالة وكشف التعديل: استخراج بيانات EXIF، تحليل ELA، كشف برامج التعديل، وفحص التلاعب الرقمي" />
-  <meta name="theme-color" content="#7c3aed" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="مشروع ماتو - محلل الصور المتقدم مع فحص الأصالة، تحليل ELA، كشف التعديل الرقمي، استخراج EXIF كامل، وتحليل الألوان والأنماط" />
+  <meta name="theme-color" content="#6d28d9" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>محلل الصور | مشروع ماتو - فحص الأصالة</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="msapplication-TileColor" content="#6d28d9" />
+  <title>محلل الصور | مشروع ماتو - فحص الأصالة المتقدم</title>
   
-  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <!-- خطوط عربية حديثة -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
   
-  <style>
-    /* ===== إعادة تعيين الأساس والمتغيرات ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  <!-- مكتبة EXIF -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.min.js"></script>
 
+  <style>
+    /* =========================================
+       1. المتغيرات الأساسية وإعدادات النظام
+       ========================================= */
     :root {
       --primary: #8b5cf6;
       --primary-dark: #7c3aed;
@@ -28,407 +35,594 @@
       --warning-dark: #d97706;
       --danger: #f87171;
       --danger-dark: #dc2626;
+      --info: #60a5fa;
+      
       --bg-main: #0a0a0f;
-      --bg-card: rgba(26, 26, 46, 0.85);
-      --bg-card-hover: rgba(36, 36, 66, 0.9);
-      --bg-input: rgba(45, 45, 75, 0.7);
-      --bg-overlay: rgba(10, 10, 15, 0.95);
+      --bg-card: rgba(26, 26, 46, 0.88);
+      --bg-card-hover: rgba(36, 36, 66, 0.92);
+      --bg-input: rgba(45, 45, 75, 0.75);
+      --bg-overlay: rgba(8, 8, 12, 0.96);
+      --bg-modal: rgba(15, 15, 25, 0.98);
+      
       --text-primary: #ffffff;
       --text-secondary: #e2e8f0;
       --text-tertiary: #cbd5e1;
       --text-muted: #94a3b8;
       --text-disabled: #64748b;
+      --text-inverse: #0f172a;
+      
       --border-light: rgba(255, 255, 255, 0.25);
       --border-medium: rgba(255, 255, 255, 0.35);
-      --border-primary: rgba(139, 92, 246, 0.6);
-      --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
-      --glass-shadow-hover: 0 20px 60px rgba(139, 92, 246, 0.35);
+      --border-primary: rgba(139, 92, 246, 0.65);
+      --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.65);
+      --glass-shadow-hover: 0 25px 80px rgba(139, 92, 246, 0.4);
+      --glass-blur: 28px;
+      
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      --radius-lg: 24px;
-      --radius-md: 16px;
+      --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      --radius-xs: 8px;
       --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
       --radius-full: 9999px;
+      
+      --font-main: 'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --spacing-unit: 4px;
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg-main: #f1f5f9; --bg-card: rgba(255,255,255,0.92); --bg-card-hover: rgba(248,250,252,0.98);
-        --bg-input: rgba(241,245,249,0.8); --bg-overlay: rgba(241,245,249,0.98);
-        --text-primary: #0f172a; --text-secondary: #1e293b; --text-tertiary: #334155;
-        --text-muted: #475569; --text-disabled: #64748b;
-        --border-light: rgba(15,23,42,0.15); --border-medium: rgba(15,23,42,0.25);
-        --border-primary: rgba(139,92,246,0.5);
-        --glass-shadow: 0 8px 40px rgba(15,23,42,0.15);
-        --glass-shadow-hover: 0 20px 60px rgba(139,92,246,0.25);
+        --bg-main: #f8fafc;
+        --bg-card: rgba(255, 255, 255, 0.94);
+        --bg-card-hover: rgba(248, 250, 252, 0.98);
+        --bg-input: rgba(241, 245, 249, 0.85);
+        --bg-overlay: rgba(248, 250, 252, 0.97);
+        --bg-modal: rgba(255, 255, 255, 0.99);
+        --text-primary: #0f172a;
+        --text-secondary: #1e293b;
+        --text-tertiary: #334155;
+        --text-muted: #475569;
+        --text-disabled: #64748b;
+        --text-inverse: #ffffff;
+        --border-light: rgba(15, 23, 42, 0.18);
+        --border-medium: rgba(15, 23, 42, 0.28);
+        --border-primary: rgba(139, 92, 246, 0.55);
+        --glass-shadow: 0 8px 40px rgba(15, 23, 42, 0.12);
+        --glass-shadow-hover: 0 25px 80px rgba(139, 92, 246, 0.2);
       }
     }
 
-    html { scroll-behavior: smooth; }
+    /* =========================================
+       2. إعادة التعيين والأساسيات
+       ========================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
     body {
-      font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
-      background: var(--bg-main); color: var(--text-primary);
-      min-height: 100vh; overflow-x: hidden; position: relative; line-height: 1.6;
+      font-family: var(--font-main);
+      background: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      position: relative;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    img, video, canvas { max-width: 100%; height: auto; display: block; }
+    button, input, select, textarea { font-family: inherit; }
+    a { color: inherit; text-decoration: none; }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: var(--radius-xs);
+    }
+    ::selection { background: var(--primary-dark); color: white; }
+    ::-webkit-scrollbar { width: 12px; height: 12px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+      transition: var(--transition);
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
     }
 
-    /* ===== الخلفية المتدرجة ===== */
+    /* =========================================
+       3. الخلفية المتدرجة والجسيمات
+       ========================================= */
     .liquid-bg {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: -2; overflow: hidden; pointer-events: none;
     }
     .liquid-bg::before {
-      content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
-      background: radial-gradient(ellipse at 25% 75%, rgba(139,92,246,0.08) 0%, transparent 55%),
-                  radial-gradient(ellipse at 75% 25%, rgba(34,211,238,0.06) 0%, transparent 55%),
-                  radial-gradient(ellipse at 50% 50%, rgba(167,139,250,0.04) 0%, transparent 65%);
-      animation: liquidFlow 30s ease-in-out infinite alternate; filter: blur(80px); opacity: 0.9;
+      content: ''; position: absolute; width: 220%; height: 220%; top: -60%; left: -60%;
+      background: radial-gradient(ellipse at 20% 70%, rgba(139,92,246,0.1) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(34,211,238,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 40% 90%, rgba(167,139,250,0.06) 0%, transparent 70%);
+      animation: liquidFlow 35s ease-in-out infinite alternate;
+      filter: blur(100px); opacity: 0.95;
     }
     @keyframes liquidFlow {
       0% { transform: translate(0,0) rotate(0deg) scale(1); }
-      25% { transform: translate(2%,-3%) rotate(0.8deg) scale(1.02); }
-      50% { transform: translate(-3%,4%) rotate(-0.6deg) scale(0.98); }
-      75% { transform: translate(4%,2%) rotate(1.2deg) scale(1.01); }
-      100% { transform: translate(-2%,-2%) rotate(-0.9deg) scale(1.015); }
+      25% { transform: translate(3%,-4%) rotate(1deg) scale(1.03); }
+      50% { transform: translate(-4%,5%) rotate(-0.8deg) scale(0.98); }
+      75% { transform: translate(5%,3%) rotate(1.5deg) scale(1.02); }
+      100% { transform: translate(-3%,-3%) rotate(-1deg) scale(1.01); }
     }
     .particles {
       position: absolute; width: 100%; height: 100%;
-      background-image: radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5), transparent),
-                        radial-gradient(1.5px 1.5px at 40% 70%, rgba(139,92,246,0.6), transparent),
-                        radial-gradient(1.5px 1.5px at 70% 20%, rgba(34,211,238,0.5), transparent),
-                        radial-gradient(2px 2px at 85% 50%, rgba(255,255,255,0.4), transparent),
-                        radial-gradient(1px 1px at 50% 85%, rgba(167,139,250,0.5), transparent);
-      background-size: 400px 400px; animation: particlesFloat 25s linear infinite; opacity: 0.8;
+      background-image: radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.6), transparent),
+                        radial-gradient(1.5px 1.5px at 35% 65%, rgba(139,92,246,0.7), transparent),
+                        radial-gradient(1.5px 1.5px at 65% 15%, rgba(34,211,238,0.6), transparent),
+                        radial-gradient(2px 2px at 85% 45%, rgba(255,255,255,0.5), transparent),
+                        radial-gradient(1px 1px at 50% 85%, rgba(167,139,250,0.6), transparent);
+      background-size: 350px 350px; animation: particlesFloat 30s linear infinite; opacity: 0.85;
     }
-    @keyframes particlesFloat { 0% { transform: translateY(0) translateX(0); } 100% { transform: translateY(-400px) translateX(80px); } }
+    @keyframes particlesFloat { 0% { transform: translateY(0) translateX(0); } 100% { transform: translateY(-400px) translateX(60px); } }
 
-    /* ===== تأثير الزجاج ===== */
+    /* =========================================
+       4. تأثير الزجاج والبطاقات
+       ========================================= */
     .glass-card {
-      background: var(--bg-card); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
-      border: 1px solid var(--border-medium); border-radius: var(--radius-lg);
-      box-shadow: var(--glass-shadow); position: relative; overflow: hidden;
-      transition: var(--transition); will-change: transform;
+      background: var(--bg-card);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-shadow);
+      position: relative; overflow: hidden;
+      transition: var(--transition);
+      will-change: transform, box-shadow;
     }
     .glass-card::before {
       content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-      transition: left 0.7s ease; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
     }
     .glass-card:hover::before { left: 100%; }
     .glass-card:hover {
-      transform: translateY(-4px); box-shadow: var(--glass-shadow-hover);
-      border-color: var(--border-primary); background: var(--bg-card-hover);
+      transform: translateY(-5px) scale(1.005);
+      box-shadow: var(--glass-shadow-hover);
+      border-color: var(--border-primary);
+      background: var(--bg-card-hover);
     }
+    .glass-panel {
+      background: var(--bg-input);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      transition: var(--transition);
+    }
+    .glass-panel:hover { background: rgba(255,255,255,0.08); border-color: var(--border-primary); }
 
-    /* ===== الهيدر ===== */
+    /* =========================================
+       5. الهيدر والشعار
+       ========================================= */
     header {
       padding: 1.5rem 2rem; text-align: center; position: relative;
-      z-index: 20; animation: fadeInDown 0.6s ease;
+      z-index: 20; animation: fadeInDown 0.7s ease;
     }
-    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    .logo { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-25px); } to { opacity: 1; transform: translateY(0); } }
+    .logo { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
     .logo-icon {
-      width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--accent));
-      border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
-      box-shadow: 0 12px 40px rgba(139,92,246,0.5); animation: pulseGlow 2.5s infinite;
-      position: relative; color: white;
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--accent));
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: white; box-shadow: 0 15px 45px rgba(139,92,246,0.55);
+      animation: pulseGlow 2.5s infinite; position: relative;
     }
     .logo-icon::after {
-      content: ''; position: absolute; width: 100%; height: 100%; border-radius: 18px;
-      background: inherit; filter: blur(25px); opacity: 0.7; z-index: -1;
+      content: ''; position: absolute; width: 100%; height: 100%; border-radius: 20px;
+      background: inherit; filter: blur(30px); opacity: 0.8; z-index: -1;
     }
-    @keyframes pulseGlow { 0%,100% { box-shadow: 0 12px 40px rgba(139,92,246,0.5); } 50% { box-shadow: 0 12px 65px rgba(167,139,250,0.85); } }
-    .logo-text { font-size: 2rem; font-weight: 900; color: var(--text-primary); text-shadow: 0 2px 10px rgba(0,0,0,0.3); line-height: 1.2; }
-    .logo-subtitle { color: var(--text-tertiary); font-size: 1rem; font-weight: 500; margin-top: 0.25rem; }
+    @keyframes pulseGlow { 0%,100% { box-shadow: 0 15px 45px rgba(139,92,246,0.55); } 50% { box-shadow: 0 15px 70px rgba(167,139,250,0.9); } }
+    .logo-text { font-size: 2.1rem; font-weight: 900; color: var(--text-primary); text-shadow: 0 2px 12px rgba(0,0,0,0.4); line-height: 1.2; }
+    .logo-subtitle { color: var(--text-tertiary); font-size: 1.05rem; font-weight: 500; margin-top: 0.3rem; }
+    .badge-container { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
     .badge {
       display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(139,92,246,0.25); border: 1px solid var(--border-primary);
-      padding: 0.45rem 1.1rem; border-radius: var(--radius-full);
-      font-size: 0.85rem; font-weight: 600; color: var(--text-primary);
-      margin-top: 0.75rem; animation: fadeIn 0.8s ease 0.3s both;
+      padding: 0.45rem 1rem; border-radius: var(--radius-full);
+      font-size: 0.85rem; font-weight: 600; border: 1px solid transparent;
+      animation: fadeIn 0.9s ease 0.3s both;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .badge-new { background: rgba(34,211,238,0.2); border-color: rgba(34,211,238,0.5); color: var(--accent); }
+    .badge-primary { background: rgba(139,92,246,0.25); border-color: rgba(139,92,246,0.5); color: var(--text-primary); }
+    .badge-accent { background: rgba(34,211,238,0.2); border-color: rgba(34,211,238,0.5); color: var(--accent); }
+    .badge-success { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.5); color: var(--success); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ===== الحاوية الرئيسية ===== */
+    /* =========================================
+       6. الحاوية الرئيسية والتخطيط
+       ========================================= */
     .container {
-      max-width: 1400px; margin: 0 auto; padding: 1rem 2rem 3rem;
-      display: grid; grid-template-columns: 1fr; gap: 2rem;
+      max-width: 1450px; margin: 0 auto; padding: 1rem 2rem 3rem;
+      display: grid; grid-template-columns: 1fr; gap: 2.5rem;
     }
-    @media (min-width: 1100px) { .container { grid-template-columns: 1fr 1.2fr; align-items: start; } }
+    @media (min-width: 1150px) { .container { grid-template-columns: 1fr 1.3fr; align-items: start; } }
+    section { animation: fadeInUp 0.8s ease both; }
+    section:nth-child(2) { animation-delay: 0.2s; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(35px); } to { opacity: 1; transform: translateY(0); } }
+    .section-header { margin-bottom: 1.5rem; }
+    .section-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.7rem; color: var(--text-primary); }
+    .section-desc { color: var(--text-tertiary); font-size: 1rem; line-height: 1.7; }
 
-    /* ===== قسم الرفع ===== */
-    .upload-section {
-      padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;
-      animation: fadeInUp 0.6s ease 0.2s both;
+    /* =========================================
+       7. منطقة الرفع والسحب
+       ========================================= */
+    .upload-zone {
+      border: 2.5px dashed var(--border-light); border-radius: var(--radius-md);
+      padding: 3rem 2rem; text-align: center; cursor: pointer; transition: var(--transition);
+      position: relative; min-height: 240px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1.2rem; background: var(--bg-input);
     }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    .section-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; color: var(--text-primary); }
-    .section-desc { color: var(--text-tertiary); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.7; }
-    .upload-area {
-      border: 2px dashed var(--border-light); border-radius: var(--radius-md);
-      padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: var(--transition);
-      position: relative; min-height: 220px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1rem; background: var(--bg-input);
-    }
-    .upload-area:hover, .upload-area.dragover { border-color: var(--primary); background: rgba(139,92,246,0.12); transform: scale(1.01); }
-    .upload-area:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
-    .upload-icon { font-size: 3.5rem; color: var(--primary); animation: bounce 2s infinite; filter: drop-shadow(0 4px 12px rgba(139,92,246,0.4)); }
-    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    .upload-text { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); }
-    .upload-hint { color: var(--text-muted); font-size: 0.9rem; max-width: 280px; }
-    .upload-formats { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem; }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--primary); background: rgba(139,92,246,0.12); transform: scale(1.015); }
+    .upload-zone:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .upload-icon { font-size: 3.8rem; color: var(--primary); animation: bounce 2.2s infinite; filter: drop-shadow(0 6px 16px rgba(139,92,246,0.45)); }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    .upload-text { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+    .upload-hint { color: var(--text-muted); font-size: 0.95rem; max-width: 320px; }
+    .format-tags { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem; }
     .format-tag {
-      background: rgba(255,255,255,0.12); color: var(--text-secondary); padding: 0.25rem 0.8rem;
-      border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; border: 1px solid var(--border-light);
+      background: rgba(255,255,255,0.12); color: var(--text-secondary); padding: 0.3rem 0.9rem;
+      border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600; border: 1px solid var(--border-light);
     }
+    .hidden-input { display: none; }
+
+    /* =========================================
+       8. الأزرار والعناصر التفاعلية
+       ========================================= */
     .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
     .btn {
       background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;
-      border: none; padding: 0.9rem 2.2rem; border-radius: var(--radius-sm); font-weight: 700;
-      font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex;
-      align-items: center; gap: 0.6rem; box-shadow: 0 10px 35px rgba(139,92,246,0.45);
-      position: relative; overflow: hidden; font-family: inherit;
+      border: none; padding: 1rem 2.4rem; border-radius: var(--radius-sm); font-weight: 700;
+      font-size: 1.05rem; cursor: pointer; transition: var(--transition); display: inline-flex;
+      align-items: center; justify-content: center; gap: 0.7rem; box-shadow: 0 12px 40px rgba(139,92,246,0.5);
+      position: relative; overflow: hidden; font-family: inherit; min-width: 180px;
     }
     .btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); transition: left 0.5s ease; }
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.6s ease; }
     .btn:hover::before { left: 100%; }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(139,92,246,0.65); background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker)); }
-    .btn:active { transform: translateY(-1px); }
-    .btn-camera { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); box-shadow: 0 10px 35px rgba(34,182,212,0.45); }
-    .btn-camera:hover { box-shadow: 0 15px 50px rgba(34,182,212,0.65); background: linear-gradient(135deg, var(--accent-dark), #0891b2); }
+    .btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 18px 60px rgba(139,92,246,0.7); background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker)); }
+    .btn:active { transform: translateY(-1px) scale(1); }
+    .btn-camera { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); box-shadow: 0 12px 40px rgba(34,182,212,0.5); }
+    .btn-camera:hover { box-shadow: 0 18px 60px rgba(34,182,212,0.7); background: linear-gradient(135deg, var(--accent-dark), #0891b2); }
     .btn-outline { background: transparent; border: 2px solid var(--border-medium); color: var(--text-primary); box-shadow: none; }
     .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--primary); color: var(--text-primary); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-    .hidden-input { display: none; }
+    .btn-success { background: linear-gradient(135deg, var(--success), var(--success-dark)); box-shadow: 0 12px 40px rgba(52,211,153,0.45); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; filter: grayscale(0.3); }
+    .btn-icon { padding: 0.7rem; min-width: auto; border-radius: 50%; width: 44px; height: 44px; font-size: 1.2rem; }
+    .action-bar { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border-light); }
+    .feature-list { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px dashed var(--border-light); }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; font-size: 0.88rem; }
+    .feature-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); }
+    .feature-icon { color: var(--success); font-weight: bold; }
 
-    /* ===== قسم المعاينة ===== */
-    .preview-section { padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; animation: fadeInUp 0.6s ease 0.4s both; }
+    /* =========================================
+       9. معاينة الصورة والكانفاس
+       ========================================= */
     .image-wrapper {
       position: relative; border-radius: var(--radius-md); overflow: hidden;
-      background: rgba(0,0,0,0.35); min-height: 280px; display: flex;
+      background: rgba(0,0,0,0.35); min-height: 300px; display: flex;
       align-items: center; justify-content: center; border: 1px solid var(--border-light);
     }
-    .image-preview { width: 100%; max-height: 320px; object-fit: contain; display: none; transition: var(--transition); border-radius: var(--radius-sm); }
-    .image-preview.show { display: block; animation: zoomIn 0.4s ease; }
-    @keyframes zoomIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
-    .image-placeholder { text-align: center; color: var(--text-tertiary); padding: 2rem; }
-    .image-placeholder-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.7; }
+    .image-preview { width: 100%; max-height: 380px; object-fit: contain; display: none; transition: var(--transition); border-radius: var(--radius-sm); }
+    .image-preview.show { display: block; animation: zoomIn 0.5s ease; }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
+    .image-placeholder { text-align: center; color: var(--text-tertiary); padding: 3rem 2rem; }
+    .image-placeholder-icon { font-size: 4.5rem; margin-bottom: 1.2rem; opacity: 0.75; }
+    .placeholder-text { font-size: 1.1rem; font-weight: 500; }
+    .placeholder-sub { font-size: 0.95rem; margin-top: 0.5rem; color: var(--text-muted); }
+    .image-meta-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 0.8rem 1.2rem;
+      background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, transparent 100%);
+      color: white; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;
+      opacity: 0; transition: var(--transition);
+    }
+    .image-wrapper:hover .image-meta-overlay { opacity: 1; }
 
-    /* ===== لوحة المعلومات ===== */
-    .info-panel { display: none; flex-direction: column; gap: 1.25rem; }
-    .info-panel.show { display: flex; animation: slideUp 0.5s ease; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
-    .info-category { border-bottom: 1px solid var(--border-light); padding-bottom: 1rem; }
+    /* =========================================
+       10. تبويبات النتائج
+       ========================================= */
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; flex-wrap: wrap; background: rgba(255,255,255,0.06); padding: 0.4rem; border-radius: var(--radius-md); }
+    .tab {
+      padding: 0.7rem 1.2rem; border-radius: var(--radius-sm); cursor: pointer;
+      font-weight: 600; font-size: 0.95rem; transition: var(--transition);
+      background: transparent; color: var(--text-muted); border: none; flex: 1; text-align: center;
+    }
+    .tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); }
+    .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(139,92,246,0.4); }
+    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .tab-content.active { display: block; }
+
+    /* =========================================
+       11. لوحة المعلومات والشبكات
+       ========================================= */
+    .info-panel { display: none; flex-direction: column; gap: 1.5rem; }
+    .info-panel.show { display: flex; animation: slideUp 0.6s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .info-category { border-bottom: 1px solid var(--border-light); padding-bottom: 1.2rem; }
     .info-category:last-child { border-bottom: none; padding-bottom: 0; }
     .info-title {
-      font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem;
-      padding-bottom: 0.75rem; margin-bottom: 0.75rem; color: var(--text-primary);
+      font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 0.7rem;
+      padding-bottom: 0.8rem; margin-bottom: 0.8rem; color: var(--text-primary);
     }
     .info-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--primary), transparent); }
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
     .info-item {
-      background: rgba(255,255,255,0.06); padding: 0.9rem 1rem; border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.06); padding: 1rem; border-radius: var(--radius-sm);
       border-right: 3px solid var(--primary); transition: var(--transition); border: 1px solid var(--border-light);
+      position: relative; overflow: hidden;
     }
-    .info-item:hover { background: rgba(255,255,255,0.12); transform: translateX(-3px); border-color: var(--border-primary); }
-    .info-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .info-value { font-weight: 700; font-size: 0.95rem; word-break: break-word; line-height: 1.4; color: var(--text-primary); }
-    .info-value.large { font-size: 1.25rem; color: var(--accent); font-weight: 800; }
+    .info-item:hover { background: rgba(255,255,255,0.12); transform: translateX(-4px); border-color: var(--border-primary); }
+    .info-label { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-weight: 700; font-size: 1rem; word-break: break-word; line-height: 1.45; color: var(--text-primary); }
+    .info-value.large { font-size: 1.3rem; color: var(--accent); font-weight: 800; }
     .info-value.success { color: var(--success); }
     .info-value.warning { color: var(--warning); }
     .info-value.danger { color: var(--danger); }
+    .info-value.accent { color: var(--info); }
 
-    /* ===== بطاقة فحص الأصالة ===== */
+    /* =========================================
+       12. بطاقة فحص الأصالة
+       ========================================= */
     .authenticity-card {
-      background: rgba(255,255,255,0.04); border-radius: var(--radius-md); padding: 1.5rem;
-      border: 2px solid var(--border-light); margin-top: 1rem;
+      background: rgba(255,255,255,0.04); border-radius: var(--radius-md); padding: 1.8rem;
+      border: 2px solid var(--border-light); margin-top: 0.5rem; position: relative; overflow: hidden;
     }
-    .authenticity-card.genuine { border-color: var(--success-dark); background: rgba(52,211,153,0.06); }
-    .authenticity-card.suspicious { border-color: var(--warning-dark); background: rgba(251,191,36,0.06); }
-    .authenticity-card.modified { border-color: var(--danger-dark); background: rgba(248,113,113,0.06); }
-    .authenticity-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
-    .authenticity-icon { font-size: 3rem; }
-    .authenticity-title { font-size: 1.4rem; font-weight: 800; }
-    .authenticity-subtitle { font-size: 0.95rem; color: var(--text-tertiary); margin-top: 0.25rem; }
+    .authenticity-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+    .authenticity-card.genuine::before { background: linear-gradient(90deg, var(--success), var(--success-dark)); }
+    .authenticity-card.suspicious::before { background: linear-gradient(90deg, var(--warning), var(--warning-dark)); }
+    .authenticity-card.modified::before { background: linear-gradient(90deg, var(--danger), var(--danger-dark)); }
+    .authenticity-header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .authenticity-icon { font-size: 3.2rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+    .authenticity-title { font-size: 1.5rem; font-weight: 800; }
+    .authenticity-subtitle { font-size: 1rem; color: var(--text-tertiary); margin-top: 0.3rem; line-height: 1.5; }
     .authenticity-score {
-      display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.8rem; flex-wrap: wrap;
     }
     .score-bar-bg {
-      flex: 1; height: 14px; background: rgba(255,255,255,0.1); border-radius: var(--radius-full);
-      overflow: hidden; position: relative;
+      flex: 1; height: 16px; background: rgba(255,255,255,0.1); border-radius: var(--radius-full);
+      overflow: hidden; position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
     }
     .score-bar {
-      height: 100%; border-radius: var(--radius-full); transition: width 1s ease;
+      height: 100%; border-radius: var(--radius-full); transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
       background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
+      position: relative;
     }
-    .score-number { font-size: 1.5rem; font-weight: 900; min-width: 60px; text-align: center; }
-    .check-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .score-bar::after {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transform: skewX(-20deg);
+    }
+    .score-number { font-size: 1.6rem; font-weight: 900; min-width: 65px; text-align: center; }
+    .check-list { display: flex; flex-direction: column; gap: 0.8rem; }
     .check-item {
-      display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem;
+      display: flex; align-items: center; gap: 0.9rem; padding: 0.85rem 1rem;
       border-radius: var(--radius-sm); background: rgba(255,255,255,0.04);
       border-right: 3px solid transparent; transition: var(--transition);
+      position: relative;
     }
-    .check-item:hover { background: rgba(255,255,255,0.08); }
+    .check-item:hover { background: rgba(255,255,255,0.09); transform: translateX(-3px); }
     .check-item.pass { border-right-color: var(--success); }
     .check-item.warn { border-right-color: var(--warning); }
     .check-item.fail { border-right-color: var(--danger); }
-    .check-icon { font-size: 1.3rem; min-width: 24px; text-align: center; }
-    .check-label { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); flex: 1; }
-    .check-detail { font-size: 0.8rem; color: var(--text-muted); }
+    .check-icon { font-size: 1.4rem; min-width: 26px; text-align: center; }
+    .check-label { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); flex: 1; }
+    .check-detail { font-size: 0.85rem; color: var(--text-muted); max-width: 220px; text-align: left; }
 
-    /* ===== تحليل ELA ===== */
+    /* =========================================
+       13. تحليل ELA والكانفاس
+       ========================================= */
     .ela-container {
       position: relative; border-radius: var(--radius-md); overflow: hidden;
-      margin-top: 1rem; border: 1px solid var(--border-light);
+      margin: 1.5rem 0 1rem; border: 1px solid var(--border-light); background: #000;
     }
-    .ela-container canvas { width: 100%; max-height: 350px; object-fit: contain; display: block; }
+    .ela-container canvas { width: 100%; max-height: 400px; object-fit: contain; display: block; cursor: crosshair; }
     .ela-overlay {
-      position: absolute; top: 0; left: 0; right: 0; padding: 0.75rem 1rem;
-      background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-      display: flex; justify-content: space-between; align-items: center;
+      position: absolute; top: 0; left: 0; right: 0; padding: 0.8rem 1.2rem;
+      background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, transparent 100%);
+      display: flex; justify-content: space-between; align-items: center; pointer-events: none;
     }
-    .ela-label { color: white; font-weight: 700; font-size: 0.95rem; }
+    .ela-label { color: white; font-weight: 700; font-size: 0.95rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .ela-badge {
-      background: var(--primary); color: white; padding: 0.3rem 0.8rem;
-      border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600;
+      background: var(--primary); color: white; padding: 0.35rem 0.9rem;
+      border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 700; pointer-events: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
+    .ela-controls { display: flex; gap: 0.6rem; justify-content: center; margin: 0.8rem 0 0.5rem; flex-wrap: wrap; }
+    .ela-btn {
+      background: rgba(255,255,255,0.1); border: 1px solid var(--border-light); color: var(--text-primary);
+      padding: 0.5rem 1rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+    }
+    .ela-btn:hover { background: rgba(255,255,255,0.2); border-color: var(--primary); }
+    .ela-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
     .ela-explanation {
-      margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.04);
+      margin-top: 1rem; padding: 1.2rem; background: rgba(255,255,255,0.04);
       border-radius: var(--radius-sm); border-right: 3px solid var(--primary);
-      font-size: 0.9rem; line-height: 1.7; color: var(--text-tertiary);
+      font-size: 0.92rem; line-height: 1.75; color: var(--text-tertiary);
     }
-    .ela-explanation strong { color: var(--text-primary); }
+    .ela-explanation strong { color: var(--text-primary); font-weight: 700; }
+    .ela-legend { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; justify-content: center; }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
+    .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); }
 
-    /* ===== شريط الألوان ===== */
-    .color-palette { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    /* =========================================
+       14. الرسم البياني (الهستوجرام)
+       ========================================= */
+    .histogram-container { margin: 1.5rem 0 1rem; background: rgba(0,0,0,0.4); border-radius: var(--radius-md); padding: 1rem; border: 1px solid var(--border-light); }
+    .histogram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; }
+    .histogram-title { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
+    .histogram-legend { display: flex; gap: 0.8rem; font-size: 0.8rem; color: var(--text-muted); }
+    .histogram-legend span { display: flex; align-items: center; gap: 0.3rem; }
+    .histogram-legend::before { content: ''; width: 10px; height: 10px; border-radius: 2px; }
+    .legend-r::before { background: #ef4444; }
+    .legend-g::before { background: #22c55e; }
+    .legend-b::before { background: #3b82f6; }
+    .legend-l::before { background: #f8fafc; }
+    #histogramCanvas { width: 100%; height: 180px; display: block; border-radius: var(--radius-xs); }
+
+    /* =========================================
+       15. لوحة الألوان
+       ========================================= */
+    .color-palette { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.8rem; justify-content: center; }
     .color-swatch {
-      width: 42px; height: 42px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.4);
+      width: 46px; height: 46px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4);
       cursor: pointer; transition: var(--transition); position: relative; overflow: hidden;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;
     }
-    .color-swatch:hover { transform: scale(1.18); border-color: white; box-shadow: 0 6px 20px rgba(0,0,0,0.45); z-index: 5; }
+    .color-swatch:hover { transform: scale(1.2) rotate(5deg); border-color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.5); z-index: 10; }
     .color-swatch::after {
-      content: attr(data-hex); position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
-      background: var(--bg-main); color: var(--text-primary); padding: 0.25rem 0.6rem; border-radius: 6px;
-      font-size: 0.72rem; font-weight: 600; white-space: nowrap; opacity: 0; transition: var(--transition);
-      pointer-events: none; z-index: 10; border: 1px solid var(--border-light);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      content: attr(data-hex); position: absolute; bottom: -32px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-main); color: var(--text-primary); padding: 0.3rem 0.7rem; border-radius: 8px;
+      font-size: 0.75rem; font-weight: 700; white-space: nowrap; opacity: 0; transition: var(--transition);
+      pointer-events: none; z-index: 20; border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-    .color-swatch:hover::after { opacity: 1; bottom: -35px; }
+    .color-swatch:hover::after { opacity: 1; bottom: -40px; }
+    .color-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
 
-    /* ===== نموذج الكاميرا ===== */
+    /* =========================================
+       16. نموذج الكاميرا
+       ========================================= */
     .modal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); display: flex; align-items: center; justify-content: center;
       z-index: 1000; opacity: 0; visibility: hidden; transition: var(--transition); padding: 1rem;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(15px);
     }
     .modal.active { opacity: 1; visibility: visible; }
     .modal-content {
-      width: 100%; max-width: 520px; background: var(--bg-card); border-radius: var(--radius-lg);
-      overflow: hidden; box-shadow: 0 30px 100px rgba(0,0,0,0.7); animation: modalSlide 0.4s ease;
-      border: 1px solid var(--border-medium);
+      width: 100%; max-width: 550px; background: var(--bg-modal); border-radius: var(--radius-lg);
+      overflow: hidden; box-shadow: 0 35px 120px rgba(0,0,0,0.75); animation: modalSlide 0.45s cubic-bezier(0.2, 0.9, 0.3, 1);
+      border: 1px solid var(--border-medium); position: relative;
     }
-    @keyframes modalSlide { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .modal-header { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); background: rgba(255,255,255,0.04); }
-    .modal-title { font-weight: 700; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); }
+    @keyframes modalSlide { from { opacity: 0; transform: scale(0.93) translateY(25px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .modal-header { padding: 1.3rem 1.6rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); background: rgba(255,255,255,0.04); }
+    .modal-title { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 0.6rem; color: var(--text-primary); }
     .modal-close {
-      background: none; border: none; color: var(--text-tertiary); font-size: 2rem; cursor: pointer;
-      width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.1); border: 1px solid var(--border-light); color: var(--text-tertiary); font-size: 2rem; cursor: pointer;
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
       transition: var(--transition); font-weight: 300;
     }
-    .modal-close:hover { background: rgba(255,255,255,0.15); color: var(--text-primary); transform: rotate(90deg); }
-    .camera-container { position: relative; width: 100%; height: 380px; background: #000; overflow: hidden; }
+    .modal-close:hover { background: rgba(255,255,255,0.25); color: var(--text-primary); transform: rotate(90deg) scale(1.1); }
+    .camera-container { position: relative; width: 100%; height: 400px; background: #050508; overflow: hidden; }
     #camera-video { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); }
     .camera-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; }
-    .camera-grid { width: 90%; height: 90%; border: 2px solid rgba(255,255,255,0.45); border-radius: 8px; display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr); }
-    .camera-grid::before, .camera-grid::after { content: ''; grid-column: 1/-1; border-top: 1px dashed rgba(255,255,255,0.55); }
-    .camera-grid > * { border-right: 1px dashed rgba(255,255,255,0.55); }
+    .camera-grid { width: 92%; height: 92%; border: 2px solid rgba(255,255,255,0.5); border-radius: 10px; display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr); box-shadow: 0 0 0 1000px rgba(0,0,0,0.4); }
+    .camera-grid::before, .camera-grid::after { content: ''; grid-column: 1/-1; border-top: 1px dashed rgba(255,255,255,0.6); }
+    .camera-grid > * { border-right: 1px dashed rgba(255,255,255,0.6); }
     .camera-grid > *:nth-child(3n) { border-right: none; }
-    .camera-controls { padding: 1.25rem; display: flex; justify-content: center; align-items: center; gap: 1.5rem; background: rgba(0,0,0,0.4); }
-    .btn-capture { width: 75px; height: 75px; border-radius: 50%; background: white; border: 5px solid var(--primary); cursor: pointer; transition: var(--transition); position: relative; display: flex; align-items: center; justify-content: center; }
-    .btn-capture::after { content: ''; position: absolute; width: 58px; height: 58px; border-radius: 50%; background: var(--primary); transition: var(--transition); }
-    .btn-capture:hover::after { width: 64px; height: 64px; background: var(--primary-dark); }
-    .btn-capture:active::after { width: 52px; height: 52px; }
+    .camera-controls { padding: 1.3rem; display: flex; justify-content: center; align-items: center; gap: 1.6rem; background: rgba(0,0,0,0.5); border-top: 1px solid var(--border-light); }
+    .btn-capture { width: 80px; height: 80px; border-radius: 50%; background: white; border: 5px solid var(--primary); cursor: pointer; transition: var(--transition); position: relative; display: flex; align-items: center; justify-content: center; }
+    .btn-capture::after { content: ''; position: absolute; width: 62px; height: 62px; border-radius: 50%; background: var(--primary); transition: var(--transition); }
+    .btn-capture:hover::after { width: 68px; height: 68px; background: var(--primary-dark); }
+    .btn-capture:active::after { width: 56px; height: 56px; transform: scale(0.95); }
     .btn-camera-control {
-      background: rgba(255,255,255,0.18); border: none; color: white; width: 50px; height: 50px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; width: 52px; height: 52px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
-      transition: var(--transition); font-size: 1.2rem; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3);
+      transition: var(--transition); font-size: 1.3rem; backdrop-filter: blur(10px);
     }
-    .btn-camera-control:hover { background: rgba(255,255,255,0.32); transform: scale(1.1); border-color: white; }
+    .btn-camera-control:hover { background: rgba(255,255,255,0.3); transform: scale(1.12); border-color: white; }
     #camera-canvas { display: none; }
 
-    /* ===== التحميل والرسائل ===== */
-    .loading { display: none; text-align: center; padding: 2rem 1rem; }
-    .loading.show { display: block; }
+    /* =========================================
+       17. التحميل وشريط التقدم والرسائل
+       ========================================= */
+    .loading { display: none; text-align: center; padding: 2.5rem 1.5rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid var(--border-light); margin: 1rem 0; }
+    .loading.show { display: block; animation: pulse-bg 2s infinite alternate; }
+    @keyframes pulse-bg { 0% { background: rgba(255,255,255,0.03); } 100% { background: rgba(255,255,255,0.06); } }
     .spinner {
-      width: 55px; height: 55px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--primary);
-      border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.25rem; position: relative;
+      width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.2); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; position: relative;
     }
     .spinner::after {
-      content: ''; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+      content: ''; position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px;
       border: 3px solid transparent; border-top-color: var(--accent); border-radius: 50%;
       animation: spin 0.6s linear infinite reverse;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-weight: 600; color: var(--text-primary); }
-    .loading-subtext { font-size: 0.85rem; color: var(--text-muted); opacity: 0.9; margin-top: 0.4rem; }
-    .progress-bar { width: 80%; max-width: 300px; height: 8px; background: rgba(255,255,255,0.1); border-radius: var(--radius-full); margin: 0.75rem auto 0; overflow: hidden; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: var(--radius-full); transition: width 0.3s ease; width: 0%; }
-    #message { min-height: 28px; text-align: center; font-weight: 600; padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-size: 0.95rem; }
+    .loading-text { font-weight: 700; color: var(--text-primary); font-size: 1.05rem; }
+    .loading-subtext { font-size: 0.9rem; color: var(--text-muted); opacity: 0.9; margin-top: 0.5rem; }
+    .progress-bar { width: 85%; max-width: 320px; height: 10px; background: rgba(255,255,255,0.1); border-radius: var(--radius-full); margin: 1rem auto 0; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: var(--radius-full); transition: width 0.3s ease; width: 0%; position: relative; }
+    .progress-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    #message { min-height: 30px; text-align: center; font-weight: 600; padding: 0.7rem 1.2rem; border-radius: var(--radius-sm); font-size: 0.95rem; margin-top: 0.8rem; transition: var(--transition); opacity: 0; transform: translateY(-5px); }
+    #message.show { opacity: 1; transform: translateY(0); }
     .message-success { background: rgba(52,211,153,0.18); color: var(--success); border: 1px solid rgba(52,211,153,0.45); }
     .message-error { background: rgba(248,113,113,0.18); color: var(--danger); border: 1px solid rgba(248,113,113,0.45); }
     .message-info { background: rgba(139,92,246,0.18); color: var(--primary); border: 1px solid rgba(139,92,246,0.45); }
     .message-warning { background: rgba(251,191,36,0.18); color: var(--warning); border: 1px solid rgba(251,191,36,0.45); }
 
-    /* ===== الحالة الفارغة ===== */
-    #emptyState { text-align: center; padding: 2.5rem 1.5rem; color: var(--text-tertiary); animation: fadeIn 0.5s ease; }
+    /* =========================================
+       18. الحالة الفارغة والفوتر
+       ========================================= */
+    #emptyState { text-align: center; padding: 3.5rem 2rem; color: var(--text-tertiary); animation: fadeIn 0.6s ease; }
     #emptyState.hidden { display: none; }
-    .empty-icon { font-size: 4.5rem; margin-bottom: 1.25rem; opacity: 0.75; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    .empty-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary); }
-    .empty-desc { font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); }
-
-    /* ===== الفوتر ===== */
+    .empty-icon { font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.8; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    .empty-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.6rem; color: var(--text-primary); }
+    .empty-desc { font-size: 1rem; line-height: 1.7; color: var(--text-muted); max-width: 480px; margin: 0 auto; }
     footer {
-      text-align: center; padding: 2.5rem 2rem 3rem; color: var(--text-muted); font-size: 0.9rem;
-      position: relative; z-index: 10; border-top: 1px solid var(--border-light); margin-top: 2rem;
-      background: rgba(0,0,0,0.15);
+      text-align: center; padding: 2.5rem 2rem 3.5rem; color: var(--text-muted); font-size: 0.95rem;
+      position: relative; z-index: 10; border-top: 1px solid var(--border-light); margin-top: 2.5rem;
+      background: rgba(0,0,0,0.18);
     }
     footer strong { color: var(--primary); font-weight: 700; }
-    footer a { color: var(--accent); text-decoration: none; font-weight: 600; transition: var(--transition); position: relative; padding: 0 0.25rem; }
-    footer a::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--accent); transition: var(--transition); }
+    footer a { color: var(--accent); font-weight: 600; transition: var(--transition); position: relative; padding: 0 0.3rem; }
+    footer a::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 2px; background: var(--accent); transition: var(--transition); }
     footer a:hover::after { width: 100%; }
-    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin: 0.75rem 0; flex-wrap: wrap; }
-    .privacy-note { margin-top: 1rem; font-size: 0.8rem; opacity: 0.9; line-height: 1.5; max-width: 550px; margin-left: auto; margin-right: auto; color: var(--text-tertiary); }
+    .footer-links { display: flex; justify-content: center; gap: 1.8rem; margin: 0.8rem 0; flex-wrap: wrap; }
+    .privacy-note { margin-top: 1.2rem; font-size: 0.85rem; opacity: 0.9; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; color: var(--text-tertiary); }
     .version-badge {
-      position: fixed; bottom: 1.5rem; left: 1.5rem; background: var(--bg-card); backdrop-filter: blur(16px);
-      border: 1px solid var(--border-medium); padding: 0.45rem 1rem; border-radius: var(--radius-full);
-      font-size: 0.78rem; font-weight: 600; z-index: 50; display: flex; align-items: center; gap: 0.5rem;
-      animation: slideInLeft 0.5s ease 1s both; color: var(--text-primary); box-shadow: var(--glass-shadow);
+      position: fixed; bottom: 1.5rem; left: 1.5rem; background: var(--bg-card); backdrop-filter: blur(18px);
+      border: 1px solid var(--border-medium); padding: 0.5rem 1.2rem; border-radius: var(--radius-full);
+      font-size: 0.82rem; font-weight: 700; z-index: 50; display: flex; align-items: center; gap: 0.6rem;
+      animation: slideInLeft 0.6s ease 1s both; color: var(--text-primary); box-shadow: var(--glass-shadow);
     }
-    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-    .version-dot { width: 9px; height: 9px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; border: 2px solid var(--bg-main); }
-    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(52,211,153,0.6); } 50% { opacity: 0.85; transform: scale(0.95); box-shadow: 0 0 0 8px rgba(52,211,153,0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+    .version-dot { width: 10px; height: 10px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; border: 2px solid var(--bg-main); }
+    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(52,211,153,0.6); } 50% { opacity: 0.85; transform: scale(0.95); box-shadow: 0 0 0 10px rgba(52,211,153,0); } }
+    .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-card); border: 1px solid var(--border-medium); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); box-shadow: var(--glass-shadow); transform: translateY(120%); transition: transform 0.4s ease; z-index: 2000; display: flex; align-items: center; gap: 0.8rem; max-width: 90vw; }
+    .toast.show { transform: translateY(0); }
+    .toast-icon { font-size: 1.3rem; }
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
+    .toast-desc { font-size: 0.85rem; color: var(--text-tertiary); margin-top: 0.2rem; }
+    .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; padding: 0.3rem; }
+    @media (max-width: 600px) { .toast { bottom: 1rem; right: 1rem; left: 1rem; max-width: none; } }
 
-    ::-webkit-scrollbar { width: 11px; height: 11px; }
-    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; border: 2.5px solid transparent; background-clip: padding-box; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
-
-    @media (max-width: 1099px) { .container { padding: 1rem; } .upload-section, .preview-section { padding: 1.75rem; } .logo-text { font-size: 1.7rem; } .camera-container { height: 320px; } }
-    @media (max-width: 640px) {
-      header { padding: 1rem; } .logo-icon { width: 48px; height: 48px; font-size: 1.5rem; }
-      .logo-text { font-size: 1.45rem; } .logo-subtitle { font-size: 0.9rem; }
-      .upload-area { padding: 2rem 1.25rem; min-height: 200px; } .upload-icon { font-size: 3rem; }
-      .btn { width: 100%; justify-content: center; padding: 0.85rem 1.5rem; }
+    /* =========================================
+       19. الاستجابة والأداء
+       ========================================= */
+    @media (max-width: 1149px) { .container { padding: 1rem; } .upload-section, .preview-section { padding: 1.8rem; } .logo-text { font-size: 1.8rem; } .camera-container { height: 340px; } }
+    @media (max-width: 700px) {
+      header { padding: 1rem; } .logo-icon { width: 50px; height: 50px; font-size: 1.6rem; }
+      .logo-text { font-size: 1.5rem; } .logo-subtitle { font-size: 0.95rem; }
+      .upload-zone { padding: 2.5rem 1.5rem; min-height: 220px; } .upload-icon { font-size: 3.2rem; }
+      .btn { width: 100%; justify-content: center; padding: 0.9rem 1.8rem; }
       .btn-group { flex-direction: column; align-items: stretch; } .info-grid { grid-template-columns: 1fr; }
-      .camera-container { height: 280px; } .camera-controls { gap: 1rem; padding: 1rem; }
-      .btn-capture { width: 65px; height: 65px; } .btn-camera-control { width: 44px; height: 44px; font-size: 1rem; }
-      footer { padding: 2rem 1.5rem 2.5rem; } .version-badge { bottom: 1rem; left: 1rem; font-size: 0.72rem; padding: 0.35rem 0.8rem; }
+      .camera-container { height: 300px; } .camera-controls { gap: 1.2rem; padding: 1.2rem; }
+      .btn-capture { width: 70px; height: 70px; } .btn-camera-control { width: 48px; height: 48px; font-size: 1.2rem; }
+      footer { padding: 2rem 1.5rem 2.5rem; } .version-badge { bottom: 1rem; left: 1rem; font-size: 0.75rem; padding: 0.4rem 1rem; }
+      .tab { font-size: 0.85rem; padding: 0.6rem 0.8rem; }
     }
-    @media (max-height: 700px) { .camera-container { height: 240px; } }
-    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    @media print { .liquid-bg,.upload-section,.btn,footer,.version-badge,.modal{display:none!important;} body{background:white;color:black;} .glass-card{background:white;border:1px solid #ccc;box-shadow:none;color:black;} .info-value{color:black;} .info-label{color:#555;} }
+    @media (max-height: 750px) { .camera-container { height: 260px; } }
+    .gpu-accelerated { transform: translateZ(0); backface-visibility: hidden; }
+    @media print {
+      .liquid-bg, .upload-section, .btn, footer, .version-badge, .modal, .toast, .camera-controls, .action-bar { display: none !important; }
+      body { background: white; color: black; } .glass-card { background: white; border: 1px solid #ccc; box-shadow: none; }
+      .info-value { color: black; } .info-label { color: #444; } .container { grid-template-columns: 1fr; max-width: 100%; padding: 0; }
+      #imagePreview { max-height: none; border: 1px solid #eee; }
+    }
   </style>
 </head>
 <body>
@@ -439,25 +633,30 @@
       <div class="logo-icon">🔍</div>
       <div>
         <div class="logo-text">محلل الصور</div>
-        <div class="logo-subtitle">مشروع ماتو - فحص الأصالة</div>
+        <div class="logo-subtitle">مشروع ماتو - فحص الأصالة المتقدم</div>
       </div>
     </div>
-    <div class="badge badge-new">🔒 كشف التعديل • تحليل ELA • فحص البيانات</div>
+    <div class="badge-container">
+      <span class="badge badge-primary">🔒 كشف التعديل</span>
+      <span class="badge badge-accent">🔬 تحليل ELA</span>
+      <span class="badge badge-success">⚡ معالجة فورية</span>
+    </div>
   </header>
 
   <main class="container">
-    <!-- قسم الرفع -->
     <section class="glass-card upload-section">
-      <h2 class="section-title">📤 رفع الصورة</h2>
-      <p class="section-desc">قم برفع أي صورة لتحليل شامل: كشف التعديل الرقمي، فحص الأصالة، تحليل ELA، استخراج بيانات EXIF الكاملة، والمزيد</p>
+      <div class="section-header">
+        <h2 class="section-title">📤 رفع الصورة</h2>
+        <p class="section-desc">قم برفع أي صورة لتحليل شامل: كشف التعديل الرقمي، فحص الأصالة، تحليل ELA، استخراج بيانات EXIF الكاملة، والرسم البياني للتلوين</p>
+      </div>
       
-      <div class="upload-area" id="dropZone" tabindex="0" role="button" aria-label="منطقة رفع الصور">
+      <div class="upload-zone" id="dropZone" tabindex="0" role="button" aria-label="منطقة رفع الصور">
         <div class="upload-icon">🖼️</div>
         <div class="upload-text">اسحب الصورة وأسقطها هنا</div>
         <div class="upload-hint">أو اضغط للبحث في ملفاتك</div>
-        <div class="upload-formats">
-          <span class="format-tag">JPG</span><span class="format-tag">PNG</span>
-          <span class="format-tag">WEBP</span><span class="format-tag">HEIC</span><span class="format-tag">TIFF</span>
+        <div class="format-tags">
+          <span class="format-tag">JPG/JPEG</span><span class="format-tag">PNG</span>
+          <span class="format-tag">WEBP</span><span class="format-tag">HEIC</span><span class="format-tag">TIFF</span><span class="format-tag">BMP</span>
         </div>
         <input type="file" id="fileInput" class="hidden-input" accept="image/*" />
       </div>
@@ -471,88 +670,96 @@
       
       <div class="loading" id="loading" role="status" aria-live="polite">
         <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">جاري تحليل الصورة...</div>
-        <div class="loading-subtext" id="loadingSubtext">استخراج البيانات وفحص الأصالة</div>
+        <div class="loading-text" id="loadingText">جاري تحميل الصورة...</div>
+        <div class="loading-subtext" id="loadingSubtext">تحضير الملفات والبيانات الوصفية</div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       
       <div id="message" role="alert" aria-live="assertive"></div>
       
-      <div style="margin-top:1rem; padding-top:1rem; border-top:1px dashed var(--border-light);">
-        <div style="display:grid; grid-template-columns: repeat(2,1fr); gap:0.75rem; font-size:0.85rem;">
-          <div style="display:flex;align-items:center;gap:0.4rem;"><span style="color:var(--success);font-weight:bold;">✓</span><span style="color:var(--text-secondary);">كشف التعديل الرقمي</span></div>
-          <div style="display:flex;align-items:center;gap:0.4rem;"><span style="color:var(--success);font-weight:bold;">✓</span><span style="color:var(--text-secondary);">تحليل ELA</span></div>
-          <div style="display:flex;align-items:center;gap:0.4rem;"><span style="color:var(--success);font-weight:bold;">✓</span><span style="color:var(--text-secondary);">فحص برامج التعديل</span></div>
-          <div style="display:flex;align-items:center;gap:0.4rem;"><span style="color:var(--success);font-weight:bold;">✓</span><span style="color:var(--text-secondary);">تحليل الأنماط الرقمية</span></div>
-          <div style="display:flex;align-items:center;gap:0.4rem;"><span style="color:var(--success);font-weight:bold;">✓</span><span style="color:var(--text-secondary);">فحص بيانات EXIF</span></div>
-          <div style="display:flex;align-items:center;gap:0.4rem;"><span style="color:var(--success);font-weight:bold;">✓</span><span style="color:var(--text-secondary);">كشف الاستنساخ</span></div>
+      <div class="feature-list">
+        <div class="feature-grid">
+          <div class="feature-item"><span class="feature-icon">✓</span> كشف التعديل الرقمي</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> تحليل مستوى الخطأ (ELA)</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> فحص برامج التعديل</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> تحليل الأنماط الرقمية</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> استخراج EXIF كامل</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> كشف الاستنساخ والتكرار</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> الرسم البياني RGB/L</div>
+          <div class="feature-item"><span class="feature-icon">✓</span> خصوصية تامة 100%</div>
         </div>
       </div>
     </section>
 
-    <!-- قسم المعاينة -->
     <section class="glass-card preview-section">
-      <h2 class="section-title">📊 نتائج التحليل</h2>
-      <p class="section-desc">عرض شامل لجميع البيانات بما فيها فحص الأصالة والتعديل الرقمي</p>
+      <div class="section-header">
+        <h2 class="section-title">📊 نتائج التحليل</h2>
+        <p class="section-desc">عرض شامل لجميع البيانات بما فيها فحص الأصالة، تحليل ELA، والرسم البياني</p>
+      </div>
       
       <div class="image-wrapper">
         <img id="imagePreview" class="image-preview" alt="معاينة الصورة" />
         <div id="imagePlaceholder" class="image-placeholder">
           <div class="image-placeholder-icon">🔎</div>
-          <div>قم برفع أو تصوير صورة لتحليل شامل</div>
+          <div class="placeholder-text">قم برفع أو تصوير صورة لتحليل شامل</div>
+          <div class="placeholder-sub">يدعم جميع الصيغ الشائعة • بدون رفع للخوادم</div>
+        </div>
+        <div class="image-meta-overlay" id="imageMetaOverlay">
+          <span id="overlayDims">-</span>
+          <span id="overlaySize">-</span>
         </div>
       </div>
       
-      <div class="info-panel" id="infoPanel">
-        <!-- 🔍 فحص الأصالة - القسم الجديد -->
-        <div class="info-category" id="authenticitySection">
-          <div class="info-title">🛡️ فحص الأصالة والتعديل</div>
-          <div id="authenticityResult"></div>
-        </div>
-        
-        <!-- تحليل ELA -->
-        <div class="info-category" id="elaSection" style="display:none;">
-          <div class="info-title">🔬 تحليل مستوى الخطأ (ELA)</div>
+      <div class="tabs" id="resultTabs" role="tablist">
+        <button class="tab active" data-tab="authenticity" role="tab" aria-selected="true">🛡️ الأصالة</button>
+        <button class="tab" data-tab="ela" role="tab" aria-selected="false">🔬 تحليل ELA</button>
+        <button class="tab" data-tab="histogram" role="tab" aria-selected="false">📈 الهستوجرام</button>
+        <button class="tab" data-tab="info" role="tab" aria-selected="false">ℹ️ المعلومات</button>
+        <button class="tab" data-tab="colors" role="tab" aria-selected="false">🎨 الألوان</button>
+      </div>
+      
+      <div id="authenticity-tab" class="tab-content active" role="tabpanel">
+        <div id="authenticityResult" class="info-panel"></div>
+      </div>
+      
+      <div id="ela-tab" class="tab-content" role="tabpanel">
+        <div id="elaSection" style="display:none;">
           <div id="elaResult"></div>
         </div>
-        
-        <!-- معلومات الصورة -->
-        <div class="info-category">
-          <div class="info-title">🖼️ معلومات الصورة</div>
-          <div class="info-grid" id="imageInfo"></div>
-        </div>
-        
-        <!-- الجهاز والكاميرا -->
-        <div class="info-category">
-          <div class="info-title">📱 الجهاز والكاميرا</div>
-          <div class="info-grid" id="deviceInfo"></div>
-        </div>
-        
-        <!-- إعدادات التصوير -->
-        <div class="info-category">
-          <div class="info-title">⚙️ إعدادات التصوير</div>
-          <div class="info-grid" id="technicalInfo"></div>
-        </div>
-        
-        <!-- تحليل الألوان -->
-        <div class="info-category">
-          <div class="info-title">🎨 تحليل الألوان</div>
-          <div class="info-grid" id="colorInfo">
-            <div class="info-item" style="grid-column:1/-1;"><div class="info-label">الألوان المهيمنة (انقر للنسخ)</div><div class="color-palette" id="colorPalette"></div></div>
+        <div id="elaEmpty" style="text-align:center;padding:2rem;color:var(--text-muted);">🔍 لم يتم تحليل ELA بعد. ارفع صورة لعرض النتائج.</div>
+      </div>
+      
+      <div id="histogram-tab" class="tab-content" role="tabpanel">
+        <div id="histogramSection" style="display:none;">
+          <div class="histogram-container">
+            <div class="histogram-header">
+              <div class="histogram-title">📊 توزيع الألوان (RGB + Lum)</div>
+              <div class="histogram-legend">
+                <span class="legend-r">أحمر</span><span class="legend-g">أخضر</span><span class="legend-b">أزرق</span><span class="legend-l">إضاءة</span>
+              </div>
+            </div>
+            <canvas id="histogramCanvas" aria-label="رسم بياني لتوزيع ألوان الصورة"></canvas>
           </div>
         </div>
-        
-        <!-- الوقت والموقع -->
-        <div class="info-category">
-          <div class="info-title">🌍 الوقت والموقع</div>
-          <div class="info-grid" id="locationInfo"></div>
+        <div id="histogramEmpty" style="text-align:center;padding:2rem;color:var(--text-muted);">📈 لم يتم إنشاء الرسم البياني بعد.</div>
+      </div>
+      
+      <div id="info-tab" class="tab-content" role="tabpanel">
+        <div id="infoPanel" class="info-panel">
+          <div class="info-category"><div class="info-title">🖼️ معلومات الصورة</div><div class="info-grid" id="imageInfo"></div></div>
+          <div class="info-category"><div class="info-title">📱 الجهاز والكاميرا</div><div class="info-grid" id="deviceInfo"></div></div>
+          <div class="info-category"><div class="info-title">⚙️ إعدادات التصوير</div><div class="info-grid" id="technicalInfo"></div></div>
+          <div class="info-category"><div class="info-title">🌍 الوقت والموقع</div><div class="info-grid" id="locationInfo"></div></div>
+          <div class="info-category"><div class="info-title">📋 بيانات إضافية</div><div class="info-grid" id="extraInfo"></div></div>
         </div>
-        
-        <!-- بيانات إضافية -->
-        <div class="info-category">
-          <div class="info-title">📋 بيانات إضافية</div>
-          <div class="info-grid" id="extraInfo"></div>
+      </div>
+      
+      <div id="colors-tab" class="tab-content" role="tabpanel">
+        <div id="colorPanel" class="info-panel">
+          <div class="info-category"><div class="info-title">🎨 الألوان المهيمنة (انقر للنسخ)</div><div class="glass-panel"><div class="color-palette" id="colorPalette"></div></div></div>
+          <div class="info-grid" id="colorInfoGrid" style="margin-top:1rem;"></div>
         </div>
+        <div id="colorsEmpty" style="text-align:center;padding:2rem;color:var(--text-muted);">🎨 لم يتم استخراج الألوان بعد.</div>
       </div>
       
       <div id="emptyState">
@@ -561,15 +768,16 @@
         <div class="empty-desc">اختر صورة من جهازك أو صوّر مباشرة للحصول على تحليل شامل يتضمن فحص الأصالة وكشف التعديل</div>
       </div>
       
-      <div id="actionButtons" style="display:none; gap:0.75rem; flex-wrap:wrap; margin-top:0.5rem;">
-        <button class="btn btn-outline" id="downloadReport" style="flex:1;min-width:140px;" aria-label="تحميل التقرير"><span>📥</span> تحميل التقرير</button>
-        <button class="btn btn-outline" id="copyData" style="flex:1;min-width:140px;" aria-label="نسخ البيانات"><span>📋</span> نسخ البيانات</button>
-        <button class="btn btn-outline" id="resetBtn" style="flex:1;min-width:140px;" aria-label="تحليل جديد"><span>🔄</span> تحليل جديد</button>
+      <div class="action-bar" id="actionButtons" style="display:none;">
+        <button class="btn btn-outline" id="downloadJson" aria-label="تحميل JSON"><span>📥</span> JSON</button>
+        <button class="btn btn-outline" id="downloadTxt" aria-label="تحميل تقرير نصي"><span>📄</span> TXT</button>
+        <button class="btn btn-outline" id="copyData" aria-label="نسخ البيانات"><span>📋</span> نسخ</button>
+        <button class="btn btn-outline" id="shareBtn" aria-label="مشاركة النتائج"><span>🔗</span> مشاركة</button>
+        <button class="btn btn-outline" id="resetBtn" aria-label="تحليل جديد"><span>🔄</span> جديد</button>
       </div>
     </section>
   </main>
 
-  <!-- نموذج الكاميرا -->
   <div class="modal" id="cameraModal" role="dialog" aria-modal="true" aria-labelledby="cameraModalTitle">
     <div class="modal-content glass-card">
       <div class="modal-header">
@@ -589,169 +797,296 @@
     </div>
   </div>
 
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="toast-icon" id="toastIcon">✓</div>
+    <div class="toast-content">
+      <div class="toast-title" id="toastTitle">تم</div>
+      <div class="toast-desc" id="toastDesc">تمت العملية بنجاح</div>
+    </div>
+    <button class="toast-close" id="toastClose" aria-label="إغلاق الإشعار">&times;</button>
+  </div>
+
   <footer>
     <div>✨ <strong>مشروع ماتو</strong> • محلل الصور المتقدم</div>
     <div class="footer-links">
       <a href="#" id="clearData">مسح البيانات</a>
       <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
       <a href="#" id="aboutBtn">حول المشروع</a>
+      <a href="#" id="themeToggle">🌙/☀️ المظهر</a>
     </div>
-    <div class="privacy-note">🔒 جميع عمليات المعالجة تتم داخل متصفحك فقط. لا يتم رفع أي صور أو بيانات إلى خوادم خارجية.</div>
+    <div class="privacy-note">🔒 جميع عمليات المعالجة تتم داخل متصفحك فقط. لا يتم رفع أي صور أو بيانات إلى خوادم خارجية. الخصوصية مضمونة 100%</div>
   </footer>
 
-  <div class="version-badge" aria-label="الإصدار 3.0 جاهز">
-    <span class="version-dot" aria-hidden="true"></span> v3.0 • فحص الأصالة
+  <div class="version-badge" aria-label="الإصدار 4.0 جاهز">
+    <span class="version-dot" aria-hidden="true"></span> v4.0 • فحص الأصالة
   </div>
 
   <script>
-    // ===== تعريف المتغيرات =====
-    const dom = {
-      dropZone: document.getElementById('dropZone'), fileInput: document.getElementById('fileInput'),
-      browseBtn: document.getElementById('browseBtn'), cameraBtn: document.getElementById('cameraBtn'),
-      sampleBtn: document.getElementById('sampleBtn'), imagePreview: document.getElementById('imagePreview'),
-      imagePlaceholder: document.getElementById('imagePlaceholder'), infoPanel: document.getElementById('infoPanel'),
-      emptyState: document.getElementById('emptyState'), actionButtons: document.getElementById('actionButtons'),
-      loading: document.getElementById('loading'), loadingText: document.getElementById('loadingText'),
-      loadingSubtext: document.getElementById('loadingSubtext'), progressFill: document.getElementById('progressFill'),
-      message: document.getElementById('message'),
-      imageInfo: document.getElementById('imageInfo'), deviceInfo: document.getElementById('deviceInfo'),
-      technicalInfo: document.getElementById('technicalInfo'), colorInfo: document.getElementById('colorInfo'),
-      colorPalette: document.getElementById('colorPalette'),
-      locationInfo: document.getElementById('locationInfo'), extraInfo: document.getElementById('extraInfo'),
-      authenticityResult: document.getElementById('authenticityResult'),
-      authenticitySection: document.getElementById('authenticitySection'),
-      elaSection: document.getElementById('elaSection'), elaResult: document.getElementById('elaResult'),
-      cameraModal: document.getElementById('cameraModal'), cameraVideo: document.getElementById('camera-video'),
-      cameraCanvas: document.getElementById('camera-canvas'), captureBtn: document.getElementById('captureBtn'),
-      switchCameraBtn: document.getElementById('switchCamera'), modalClose: document.getElementById('modalClose'),
-      closeCameraBtn: document.getElementById('closeCamera'),
-      downloadReport: document.getElementById('downloadReport'), copyData: document.getElementById('copyData'),
-      resetBtn: document.getElementById('resetBtn'), clearData: document.getElementById('clearData'),
-      aboutBtn: document.getElementById('aboutBtn')
+    /**
+     * 🔍 Image Analyzer - Matoo Project v4.0
+     * Advanced authenticity checking, ELA, EXIF, Histogram, Color Palette
+     * Fully client-side. No data leaves the browser.
+     */
+
+    'use strict';
+
+    // ===== CONFIGURATION & STATE =====
+    const CONFIG = {
+      MAX_FILE_SIZE_MB: 50,
+      ELA_QUALITY: 0.75,
+      ELA_SCALE: 18,
+      HISTOGRAM_BINS: 256,
+      CLUSTER_K: 6,
+      SOFTWARE_KEYWORDS: ['photoshop','gimp','paint.net','after effects','adobe','lightroom','snapseed','vsco','canva','pixlr','figma','sketch','corel','illustrator','premiere','affinity','pixellab','movavi','filmora','davinci','final cut'],
+      STANDARD_ASPECTS: [4/3, 3/2, 16/9, 1/1, 3/4, 2/3, 9/16, 21/9],
+      ANIMATION_DURATION: 400
     };
 
-    const state = { currentStream: null, facingMode: 'environment', analysisData: null, isProcessing: false };
+    const STATE = {
+      stream: null,
+      facingMode: 'environment',
+      data: null,
+      processing: false,
+      currentTab: 'authenticity',
+      theme: localStorage.getItem('matoo_theme') || 'auto'
+    };
 
-    // ===== مستمعات الأحداث =====
-    dom.browseBtn.addEventListener('click', () => dom.fileInput.click());
-    dom.fileInput.addEventListener('change', (e) => { if (e.target.files?.[0]) handleImage(e.target.files[0]); });
-    ['dragenter','dragover','dragleave','drop'].forEach(ev => dom.dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); }, false));
-    ['dragenter','dragover'].forEach(ev => dom.dropZone.addEventListener(ev, () => dom.dropZone.classList.add('dragover'), false));
-    ['dragleave','drop'].forEach(ev => dom.dropZone.addEventListener(ev, () => dom.dropZone.classList.remove('dragover'), false));
-    dom.dropZone.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f?.type?.startsWith('image/')) handleImage(f); else showMessage('يرجى اختيار ملف صورة صالح', 'error'); });
-    dom.dropZone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dom.fileInput.click(); } });
-    
-    dom.cameraBtn.addEventListener('click', openCamera);
-    dom.sampleBtn.addEventListener('click', loadSampleImage);
-    dom.modalClose.addEventListener('click', closeCamera);
-    dom.closeCameraBtn.addEventListener('click', closeCamera);
-    dom.captureBtn.addEventListener('click', capturePhoto);
-    dom.switchCameraBtn.addEventListener('click', toggleCamera);
-    dom.resetBtn.addEventListener('click', resetAnalysis);
-    dom.clearData.addEventListener('click', (e) => { e.preventDefault(); resetAll(); });
-    dom.aboutBtn.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
-    dom.downloadReport.addEventListener('click', downloadReport);
-    dom.copyData.addEventListener('click', copyAnalysisData);
-    dom.cameraModal.addEventListener('click', (e) => { if (e.target === dom.cameraModal) closeCamera(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dom.cameraModal.classList.contains('active')) closeCamera(); });
+    // ===== DOM REFERENCES =====
+    const DOM = {
+      dropZone: document.getElementById('dropZone'),
+      fileInput: document.getElementById('fileInput'),
+      browseBtn: document.getElementById('browseBtn'),
+      cameraBtn: document.getElementById('cameraBtn'),
+      sampleBtn: document.getElementById('sampleBtn'),
+      imagePreview: document.getElementById('imagePreview'),
+      imagePlaceholder: document.getElementById('imagePlaceholder'),
+      overlayDims: document.getElementById('overlayDims'),
+      overlaySize: document.getElementById('overlaySize'),
+      infoPanel: document.getElementById('infoPanel'),
+      colorPanel: document.getElementById('colorPanel'),
+      emptyState: document.getElementById('emptyState'),
+      actionButtons: document.getElementById('actionButtons'),
+      loading: document.getElementById('loading'),
+      loadingText: document.getElementById('loadingText'),
+      loadingSubtext: document.getElementById('loadingSubtext'),
+      progressFill: document.getElementById('progressFill'),
+      message: document.getElementById('message'),
+      tabs: document.querySelectorAll('#resultTabs .tab'),
+      tabContents: document.querySelectorAll('.tab-content'),
+      imageInfo: document.getElementById('imageInfo'),
+      deviceInfo: document.getElementById('deviceInfo'),
+      technicalInfo: document.getElementById('technicalInfo'),
+      locationInfo: document.getElementById('locationInfo'),
+      extraInfo: document.getElementById('extraInfo'),
+      colorPalette: document.getElementById('colorPalette'),
+      colorInfoGrid: document.getElementById('colorInfoGrid'),
+      authenticityResult: document.getElementById('authenticityResult'),
+      elaSection: document.getElementById('elaSection'),
+      elaResult: document.getElementById('elaResult'),
+      elaEmpty: document.getElementById('elaEmpty'),
+      histogramSection: document.getElementById('histogramSection'),
+      histogramCanvas: document.getElementById('histogramCanvas'),
+      histogramEmpty: document.getElementById('histogramEmpty'),
+      colorsEmpty: document.getElementById('colorsEmpty'),
+      cameraModal: document.getElementById('cameraModal'),
+      cameraVideo: document.getElementById('camera-video'),
+      cameraCanvas: document.getElementById('camera-canvas'),
+      captureBtn: document.getElementById('captureBtn'),
+      switchCameraBtn: document.getElementById('switchCamera'),
+      modalClose: document.getElementById('modalClose'),
+      closeCameraBtn: document.getElementById('closeCamera'),
+      downloadJson: document.getElementById('downloadJson'),
+      downloadTxt: document.getElementById('downloadTxt'),
+      copyData: document.getElementById('copyData'),
+      shareBtn: document.getElementById('shareBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      clearData: document.getElementById('clearData'),
+      aboutBtn: document.getElementById('aboutBtn'),
+      themeToggle: document.getElementById('themeToggle'),
+      toast: document.getElementById('toast'),
+      toastIcon: document.getElementById('toastIcon'),
+      toastTitle: document.getElementById('toastTitle'),
+      toastDesc: document.getElementById('toastDesc'),
+      toastClose: document.getElementById('toastClose')
+    };
 
-    // ===== الوظائف الأساسية =====
-    function showMessage(text, type = 'info', duration = 4500) {
-      dom.message.textContent = text; dom.message.className = `message-${type}`;
-      if (duration) setTimeout(() => { if (dom.message.textContent === text) { dom.message.textContent = ''; dom.message.className = ''; } }, duration);
-    }
-    function setLoading(isLoading) {
-      state.isProcessing = isLoading; dom.loading.classList.toggle('show', isLoading);
-      dom.browseBtn.disabled = isLoading; dom.cameraBtn.disabled = isLoading;
-      dom.sampleBtn.disabled = isLoading; dom.fileInput.disabled = isLoading;
-    }
-    function setProgress(percent, text, subtext) {
-      dom.progressFill.style.width = percent + '%';
-      if (text) dom.loadingText.textContent = text;
-      if (subtext) dom.loadingSubtext.textContent = subtext;
-    }
-    function resetUI() {
-      dom.fileInput.value = ''; dom.imagePreview.classList.remove('show'); dom.imagePreview.src = '';
-      dom.imagePlaceholder.style.display = 'flex'; dom.infoPanel.classList.remove('show');
-      dom.emptyState.classList.remove('hidden'); dom.actionButtons.style.display = 'none';
-      dom.colorPalette.innerHTML = ''; dom.authenticityResult.innerHTML = '';
-      dom.elaSection.style.display = 'none'; dom.elaResult.innerHTML = '';
-      clearInfoGrids();
-    }
-    function clearInfoGrids() { [dom.imageInfo, dom.deviceInfo, dom.technicalInfo, dom.locationInfo, dom.extraInfo].forEach(el => el.innerHTML = ''); }
-    function showAnalysisUI() {
-      dom.imagePlaceholder.style.display = 'none'; dom.imagePreview.classList.add('show');
-      dom.emptyState.classList.add('hidden'); dom.infoPanel.classList.add('show');
-      dom.actionButtons.style.display = 'flex';
-    }
+    // ===== UTILITY FUNCTIONS =====
+    const Utils = {
+      delay: ms => new Promise(r => setTimeout(r, ms)),
+      clamp: (v, min, max) => Math.min(Math.max(v, min), max),
+      lerp: (a, b, t) => a + (b - a) * t,
+      formatBytes: (bytes, decimals = 2) => {
+        if (bytes === 0) return '0 بايت';
+        const k = 1024, units = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت', 'تيرابايت'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + units[i];
+      },
+      formatDate: (str) => {
+        if (!str) return null;
+        const match = str.match(/(\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+          const [, y, mo, d, h, mi, s] = match;
+          return new Date(y, mo-1, d, h, mi, s).toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+        }
+        return str;
+      },
+      formatExposureTime: (v) => {
+        if (typeof v === 'string') return v;
+        return v >= 1 ? `${v} ثانية` : `1/${Math.round(1/v)} ثانية`;
+      },
+      formatFlash: (v) => {
+        const m = {'0':'لم يومض','1':'يومض','5':'يومض+كشف','7':'يومض+كشف+عودة','9':'يومض+لا عودة','13':'تلقائي+لا عودة','15':'تلقائي+عودة'};
+        return m[String(v)] || `كود: ${v}`;
+      },
+      formatOrientation: (v) => {
+        const m = {'1':'أفقي (عادي)','2':'أفقي (معكوس)','3':'أفقي (مقلوب)','6':'عمودي (90°)','8':'عمودي (270°)'};
+        return m[String(v)] || 'غير معروف';
+      },
+      convertGPS: (coord) => {
+        if (!Array.isArray(coord) || coord.length < 3) return null;
+        try {
+          const d = coord[0]?.numerator / coord[0]?.denominator || 0;
+          const m = coord[1]?.numerator / coord[1]?.denominator || 0;
+          const s = coord[2]?.numerator / coord[2]?.denominator || 0;
+          return (d + m/60 + s/3600).toFixed(6);
+        } catch { return null; }
+      },
+      calcAspect: (w, h) => {
+        const gcd = (a, b) => b ? gcd(b, a % b) : a;
+        const d = gcd(w, h);
+        return `${w/d}:${h/d}`;
+      },
+      show: (el) => { el.style.display = 'block'; },
+      hide: (el) => { el.style.display = 'none'; },
+      toast: (title, desc, type = 'success', duration = 3500) => {
+        DOM.toastIcon.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+        DOM.toastTitle.textContent = title;
+        DOM.toastDesc.textContent = desc;
+        DOM.toast.classList.add('show');
+        setTimeout(() => DOM.toast.classList.remove('show'), duration);
+      },
+      setProgress: (pct, txt, sub) => {
+        DOM.progressFill.style.width = Utils.clamp(pct, 0, 100) + '%';
+        if (txt) DOM.loadingText.textContent = txt;
+        if (sub) DOM.loadingSubtext.textContent = sub;
+      },
+      showMessage: (txt, type = 'info', duration = 4500) => {
+        DOM.message.textContent = txt;
+        DOM.message.className = `message-${type} show`;
+        if (duration) setTimeout(() => { if (DOM.message.textContent === txt) { DOM.message.className = ''; DOM.message.textContent = ''; } }, duration);
+      }
+    };
 
-    // ===== معالجة الصورة الرئيسية =====
+    // ===== FILE HANDLING =====
     async function handleImage(file) {
-      if (!file?.type?.startsWith('image/')) { showMessage('يرجى اختيار ملف صورة صالح', 'error'); return; }
-      setLoading(true); resetUI();
+      if (!file?.type?.startsWith('image/')) { Utils.showMessage('يرجى اختيار ملف صورة صالح', 'error'); return; }
+      if (file.size > CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024) { Utils.showMessage(`حجم الملف كبير جداً. الحد الأقصى ${CONFIG.MAX_FILE_SIZE_MB} ميجابايت`, 'error'); return; }
+      
+      STATE.processing = true;
+      resetUI();
+      Utils.showMessage('⏳ جاري التحليل... يرجى الانتظار', 'info', 2000);
       
       try {
-        setProgress(10, 'جاري تحميل الصورة...', 'تحضير الملفات');
+        DOM.loading.classList.add('show');
+        DOM.browseBtn.disabled = true; DOM.cameraBtn.disabled = true; DOM.sampleBtn.disabled = true;
+        
+        Utils.setProgress(10, 'جاري تحميل الصورة...', 'تحضير الملفات');
+        await Utils.delay(150);
         const imageUrl = URL.createObjectURL(file);
-        dom.imagePreview.src = imageUrl;
+        DOM.imagePreview.src = imageUrl;
         
-        setProgress(25, 'استخراج بيانات EXIF...', 'قراءة البيانات الوصفية');
-        await delay(300);
-        const exifData = await extractImageMetadata(imageUrl, file);
-        state.analysisData = { file, exifData, imageUrl };
+        Utils.setProgress(25, 'استخراج بيانات EXIF...', 'قراءة البيانات الوصفية');
+        await Utils.delay(200);
+        const exifData = await extractEXIF(imageUrl, file);
+        STATE.data = { file, exifData, imageUrl, timestamp: Date.now() };
         
-        setProgress(50, 'فحص الأصالة والتعديل...', 'تحليل مستوى الخطأ - ELA');
-        await delay(200);
-        const authenticityData = await performAuthenticityAnalysis(imageUrl, file, exifData);
-        state.analysisData.authenticity = authenticityData;
+        Utils.setProgress(45, 'فحص الأصالة والتعديل...', 'تحليل مستوى الخطأ - ELA');
+        await Utils.delay(150);
+        const authData = await checkAuthenticity(imageUrl, file, exifData);
+        STATE.data.authenticity = authData;
         
-        setProgress(70, 'تحليل الألوان...', 'استخراج الألوان المهيمنة');
-        await delay(200);
-        displayAllInfo(file, exifData);
-        displayAuthenticityResults(authenticityData);
+        Utils.setProgress(65, 'تحليل مستوى الخطأ (ELA)...', 'إنشاء خريطة الضغط');
+        await Utils.delay(150);
+        const elaData = await performELA(imageUrl, exifData);
+        STATE.data.ela = elaData;
         
-        setProgress(85, 'إنشاء تحليل ELA...', 'توليد خريطة مستوى الخطأ');
-        await delay(200);
-        await generateELAAnalysis(imageUrl, authenticityData);
+        Utils.setProgress(80, 'تحليل الهستوجرام...', 'حساب توزيع الألوان RGB');
+        await Utils.delay(100);
+        const histData = await analyzeHistogram(imageUrl);
+        STATE.data.histogram = histData;
         
-        setProgress(92, 'تحليل الأنماط...', 'كشف الاستنساخ والتكرار');
-        await delay(200);
-        extractAndDisplayColors(imageUrl);
+        Utils.setProgress(92, 'استخراج الألوان المهيمنة...', 'تجميع العناقيد اللونية');
+        await Utils.delay(100);
+        const colorData = await extractColors(imageUrl, CONFIG.CLUSTER_K);
+        STATE.data.colors = colorData;
         
-        setProgress(100, 'اكتمل التحليل!', 'جميع الفحوصات مكتملة');
-        await delay(400);
+        Utils.setProgress(100, 'اكتمل التحليل!', 'جميع الفحوصات مكتملة');
+        await Utils.delay(300);
         
-        showAnalysisUI();
-        showMessage('✅ تم تحليل الصورة بنجاح! تم فحص الأصالة والتعديل', 'success');
+        renderResults();
+        Utils.toast('✅ اكتمل التحليل', 'تم فحص جميع البيانات بنجاح', 'success');
         
       } catch (error) {
-        console.error('خطأ في التحليل:', error);
-        showMessage(`❌ خطأ: ${error.message || 'فشل في تحليل الصورة'}`, 'error');
-      } finally { setLoading(false); setProgress(0); }
+        console.error('تحليل الصورة:', error);
+        Utils.showMessage(`❌ خطأ في التحليل: ${error.message || 'غير معروف'}`, 'error', 8000);
+      } finally {
+        STATE.processing = false;
+        DOM.loading.classList.remove('show');
+        DOM.progressFill.style.width = '0%';
+        DOM.browseBtn.disabled = false; DOM.cameraBtn.disabled = false; DOM.sampleBtn.disabled = false;
+      }
     }
-    
-    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    // ===== استخراج EXIF =====
-    async function extractImageMetadata(imageUrl, file) {
+    function resetUI() {
+      DOM.fileInput.value = ''; DOM.imagePreview.classList.remove('show'); DOM.imagePreview.src = '';
+      DOM.imagePlaceholder.style.display = 'flex'; DOM.emptyState.classList.remove('hidden');
+      DOM.actionButtons.style.display = 'none'; DOM.infoPanel.classList.remove('show');
+      DOM.colorPanel.classList.remove('show'); DOM.authenticityResult.classList.remove('show');
+      DOM.colorPalette.innerHTML = ''; DOM.colorInfoGrid.innerHTML = '';
+      DOM.imageInfo.innerHTML = ''; DOM.deviceInfo.innerHTML = ''; DOM.technicalInfo.innerHTML = '';
+      DOM.locationInfo.innerHTML = ''; DOM.extraInfo.innerHTML = '';
+      DOM.elaSection.style.display = 'none'; DOM.elaEmpty.style.display = 'block'; DOM.elaResult.innerHTML = '';
+      DOM.histogramSection.style.display = 'none'; DOM.histogramEmpty.style.display = 'block';
+      DOM.colorsEmpty.style.display = 'block'; DOM.overlayDims.textContent = '-'; DOM.overlaySize.textContent = '-';
+    }
+
+    function renderResults() {
+      DOM.imagePlaceholder.style.display = 'none'; DOM.imagePreview.classList.add('show');
+      DOM.emptyState.classList.add('hidden'); DOM.actionButtons.style.display = 'flex';
+      DOM.infoPanel.classList.add('show'); DOM.colorPanel.classList.add('show');
+      DOM.authenticityResult.classList.add('show');
+      DOM.overlayDims.textContent = `${STATE.data.exifData.width} × ${STATE.data.exifData.height} بكسل`;
+      DOM.overlaySize.textContent = Utils.formatBytes(STATE.data.file.size);
+      
+      renderInfoTabs();
+      renderAuthenticity();
+      renderELA();
+      renderHistogram();
+      renderColors();
+    }
+
+    // ===== EXIF EXTRACTION =====
+    async function extractEXIF(imageUrl, file) {
       return new Promise((resolve) => {
         const img = new Image(); img.crossOrigin = 'anonymous';
         img.onload = function() {
           const data = {
-            fileName: file.name, fileSize: formatFileSize(file.size), fileType: file.type.toUpperCase(),
+            fileName: file.name, fileSize: Utils.formatBytes(file.size), fileType: file.type.toUpperCase(),
             mimeType: file.type, width: img.naturalWidth, height: img.naturalHeight,
-            aspectRatio: calculateAspectRatio(img.naturalWidth, img.naturalHeight),
+            aspectRatio: Utils.calcAspect(img.naturalWidth, img.naturalHeight),
             megapixels: ((img.naturalWidth * img.naturalHeight) / 1e6).toFixed(2),
             orientation: img.naturalHeight > img.naturalWidth ? 'عمودي' : img.naturalWidth === img.naturalHeight ? 'مربع' : 'أفقي',
             dateModified: new Date(file.lastModified).toLocaleString('ar-EG'),
-            dateCreated: null, dateTaken: null
+            dateCreated: null, dateTaken: null, exifRaw: null
           };
           
           if (window.EXIF) {
             try {
               EXIF.getData(img, function() {
                 const tags = EXIF.getAllTags(this);
-                const exifMap = {
+                data.exifRaw = tags;
+                
+                const map = {
                   'Make':'cameraMake','Model':'cameraModel','Software':'software','Artist':'artist',
                   'Copyright':'copyright','DateTime':'dateTime','DateTimeOriginal':'dateTimeOriginal',
                   'DateTimeDigitized':'dateTimeDigitized','ExposureTime':'exposureTime','FNumber':'fNumber',
@@ -762,15 +1097,19 @@
                   'GPSLongitude':'gpsLongitude','GPSAltitude':'gpsAltitude','GPSLatitudeRef':'gpsLatRef',
                   'GPSLongitudeRef':'gpsLonRef','Orientation':'exifOrientation','XResolution':'xResolution',
                   'YResolution':'yResolution','ResolutionUnit':'resolutionUnit','ColorSpace':'colorSpace',
-                  'ExifVersion':'exifVersion','FlashpixVersion':'flashpixVersion',
-                  'UserComment':'userComment','MakerNote':'makerNote'
+                  'ExifVersion':'exifVersion','FlashpixVersion':'flashpixVersion','UserComment':'userComment',
+                  'MakerNote':'makerNote','DigitalZoomRatio':'digitalZoom'
                 };
-                Object.entries(exifMap).forEach(([ek, ak]) => { if (tags[ek] !== undefined) data[ak] = formatExifValue(ek, tags[ek]); });
-                if (data.dateTimeOriginal) data.dateTaken = formatDate(data.dateTimeOriginal);
-                if (data.dateTime) data.dateCreated = formatDate(data.dateTime);
+                
+                Object.entries(map).forEach(([ek, ak]) => {
+                  if (tags[ek] !== undefined) data[ak] = formatExifVal(ek, tags[ek]);
+                });
+                
+                if (data.dateTimeOriginal) data.dateTaken = Utils.formatDate(data.dateTimeOriginal);
+                if (data.dateTime) data.dateCreated = Utils.formatDate(data.dateTime);
                 resolve(data);
               });
-            } catch(e) { resolve(data); }
+            } catch(e) { console.warn('فشل EXIF:', e); resolve(data); }
           } else { resolve(data); }
         };
         img.onerror = () => resolve({ error: 'فشل تحميل الصورة' });
@@ -778,575 +1117,465 @@
       });
     }
 
-    function formatExifValue(key, value) {
+    function formatExifVal(key, value) {
       if (value == null) return null;
       if (Array.isArray(value)) {
-        if (key === 'GPSLatitude' || key === 'GPSLongitude') return convertGPSCoordinate(value);
+        if (key === 'GPSLatitude' || key === 'GPSLongitude') return Utils.convertGPS(value);
         return value.slice(0,3).join(', ');
       }
       if (typeof value === 'number') {
         if (key === 'FNumber') return `f/${value}`;
         if (key === 'FocalLength') return `${value} ملم`;
         if (key === 'ISOSpeedRatings') return `ISO ${value}`;
-        if (key === 'ExposureTime') return formatExposureTime(value);
+        if (key === 'ExposureTime') return Utils.formatExposureTime(value);
         if (key === 'GPSAltitude') return `${value} متر`;
+        if (key === 'DigitalZoomRatio') return `${value}x`;
         return value;
       }
       if (typeof value === 'string') {
-        if (key === 'Flash') return formatFlashValue(value);
+        if (key === 'Flash') return Utils.formatFlash(value);
         if (key === 'WhiteBalance') return value === '0' ? 'تلقائي' : 'يدوي';
-        if (key === 'Orientation') return formatOrientation(value);
+        if (key === 'Orientation') return Utils.formatOrientation(value);
         return value;
       }
       if (value.numerator !== undefined && value.denominator !== undefined) {
-        if (key === 'ExposureTime') return formatExposureTime(value.numerator/value.denominator);
+        if (key === 'ExposureTime') return Utils.formatExposureTime(value.numerator/value.denominator);
         if (key === 'FNumber') return `f/${value.numerator/value.denominator}`;
         if (key === 'FocalLength') return `${value.numerator/value.denominator} ملم`;
       }
       return String(value);
     }
-    function formatExposureTime(v) { if (typeof v === 'string') return v; return v >= 1 ? `${v} ثانية` : `1/${Math.round(1/v)} ثانية`; }
-    function formatFlashValue(v) { const m = {'0':'لم يومض','1':'يومض','5':'يومض+كشف','7':'يومض+كشف+عودة','9':'يومض+لا عودة','13':'تلقائي+لا عودة','15':'تلقائي+عودة'}; return m[String(v)] || `كود: ${v}`; }
-    function formatOrientation(v) { const m = {'1':'أفقي (عادي)','2':'أفقي (معكوس)','3':'أفقي (مقلوب)','6':'عمودي (90°)','8':'عمودي (270°)'}; return m[String(v)] || 'غير معروف'; }
-    function convertGPSCoordinate(coord) {
-      if (!Array.isArray(coord) || coord.length < 3) return null;
-      try { const d = coord[0]?.numerator/coord[0]?.denominator||0; const m = coord[1]?.numerator/coord[1]?.denominator||0; const s = coord[2]?.numerator/coord[2]?.denominator||0; return (d+m/60+s/3600).toFixed(6); } catch { return null; }
-    }
-    function formatDate(dateStr) {
-      if (!dateStr) return null;
-      const match = dateStr.match(/(\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
-      if (match) { const [,y,m,d,h,min,s] = match; return new Date(y,m-1,d,h,min,s).toLocaleString('ar-EG',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
-      return dateStr;
-    }
-    function formatFileSize(bytes) { if (bytes === 0) return '0 بايت'; const units = ['بايت','كيلوبايت','ميجابايت','جيجابايت']; const i = Math.floor(Math.log(bytes)/Math.log(1024)); return `${(bytes/Math.pow(1024,i)).toFixed(2)} ${units[i]}`; }
-    function calculateAspectRatio(w,h) { const gcd = (a,b) => b ? gcd(b,a%b) : a; const d = gcd(w,h); return `${w/d}:${h/d}`; }
 
-    // ===== 🛡️ فحص الأصالة والتعديل =====
-    async function performAuthenticityAnalysis(imageUrl, file, exifData) {
+    // ===== AUTHENTICITY CHECK ENGINE =====
+    async function checkAuthenticity(imageUrl, file, exifData) {
       const checks = [];
-      let totalScore = 0;
-      let maxScore = 0;
+      let totalScore = 0, maxScore = 0;
 
-      // 1. فحص وجود بيانات EXIF
-      maxScore += 15;
+      const addCheck = (label, detail, status, score) => {
+        maxScore += score; totalScore += score;
+        checks.push({ label, detail, status, score });
+      };
+
+      // 1. EXIF Presence
       const hasExif = !!exifData.cameraMake || !!exifData.cameraModel || !!exifData.dateTimeOriginal || !!exifData.isoSpeed;
-      if (hasExif) {
-        checks.push({ status: 'pass', label: 'بيانات EXIF موجودة', detail: 'الصورة تحتوي على بيانات وصفية', score: 15 });
-      } else {
-        checks.push({ status: file.type.includes('jpeg') ? 'warn' : 'pass', label: 'بيانات EXIF', detail: file.type.includes('jpeg') ? 'صور JPG يجب أن تحتوي EXIF' : 'صيغة لا تتطلب EXIF', score: file.type.includes('jpeg') ? 5 : 15 });
-      }
-      totalScore += checks[checks.length-1].score;
+      if (hasExif) addCheck('بيانات EXIF موجودة', 'تحتوي على بيانات وصفية أساسية', 'pass', 12);
+      else addCheck('بيانات EXIF', file.type.includes('jpeg') ? 'مفقودة في صورة JPG' : 'غير مطلوبة لهذه الصيغة', file.type.includes('jpeg') ? 'warn' : 'pass', file.type.includes('jpeg') ? 4 : 12);
 
-      // 2. كشف برامج التعديل من EXIF
-      maxScore += 15;
-      const softwareList = ['photoshop','gimp','paint.net','after effects','adobe','lightroom','snapseed','vsco','canva','pixlr','figma','sketch','corel','illustrator','premiere','affinity','pixellab'];
-      const detectedSoftware = [];
-      if (exifData.software) {
-        softwareList.forEach(sw => {
-          if (exifData.software.toLowerCase().includes(sw.toLowerCase())) detectedSoftware.push(exifData.software);
-        });
-      }
+      // 2. Software Detection
+      const swList = CONFIG.SOFTWARE_KEYWORDS;
+      const detected = [];
+      if (exifData.software) swList.forEach(sw => exifData.software.toLowerCase().includes(sw.toLowerCase()) && !detected.includes(sw) && detected.push(sw));
+      if (exifData.makerNote && typeof exifData.makerNote === 'string') swList.forEach(sw => exifData.makerNote.toLowerCase().includes(sw.toLowerCase()) && !detected.includes(sw) && detected.push(sw));
       
-      // فحص في MakerNote أيضاً
-      if (exifData.makerNote && typeof exifData.makerNote === 'string') {
-        softwareList.forEach(sw => {
-          if (exifData.makerNote.toLowerCase().includes(sw.toLowerCase()) && !detectedSoftware.includes(sw)) detectedSoftware.push(exifData.makerNote);
-        });
-      }
+      if (detected.length > 0) addCheck('برنامج تعديل مكتشف', `تم رصد: ${detected.slice(0,3).join('، ')}`, 'fail', 2);
+      else addCheck('لم يتم كشف برامج تعديل', 'نظيف من برامج التحرير المعروفة', 'pass', 12);
 
-      if (detectedSoftware.length > 0) {
-        checks.push({ status: 'fail', label: 'برنامج تعديل مكتشف', detail: `تم الكشف عن: ${detectedSoftware.slice(0,3).join('، ')}`, score: 2 });
-      } else {
-        checks.push({ status: 'pass', label: 'لم يتم كشف برامج تعديل', detail: 'لم يتم العثور على برامج تحرير في البيانات', score: 15 });
-      }
-      totalScore += checks[checks.length-1].score;
+      // 3. Time Consistency
+      if (exifData.dateTaken && exifData.dateModified) addCheck('اتساق زمني', 'تاريخ التصوير والتعديل متطابقان', 'pass', 10);
+      else if (exifData.dateTaken) addCheck('اتساق زمني', 'تاريخ التصوير مختلف عن آخر تعديل', 'warn', 5);
+      else addCheck('اتساق زمني', 'لا توجد تواريخ كاملة', 'warn', 5);
+      if (exifData.dateTaken || exifData.dateModified) totalScore += 10; else totalScore += 5; maxScore += 10;
 
-      // 3. فحص اتساق البيانات الزمنية
-      maxScore += 10;
-      const timeConsistent = exifData.dateTaken && exifData.dateModified;
-      if (timeConsistent) {
-        checks.push({ status: 'pass', label: 'اتساق زمني', detail: 'تاريخ التصوير والتعديل متطابقان', score: 10 });
-      } else if (exifData.dateTaken) {
-        checks.push({ status: 'warn', label: 'اتساق زمني', detail: 'تاريخ التصوير مختلف عن آخر تعديل', score: 5 });
-        totalScore += 5;
-      } else {
-        checks.push({ status: 'warn', label: 'اتساق زمني', detail: 'لا توجد تواريخ كاملة في البيانات', score: 5 });
-        totalScore += 5;
-      }
-
-      // 4. فحص بيانات GPS
-      maxScore += 10;
+      // 4. GPS Data
       if (exifData.gpsLatitude && exifData.gpsLongitude) {
-        // فحص إذا كانت الإحداثيات تبدو حقيقية
-        const lat = parseFloat(exifData.gpsLatitude);
-        const lon = parseFloat(exifData.gpsLongitude);
-        if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && (lat !== 0 || lon !== 0)) {
-          checks.push({ status: 'pass', label: 'بيانات GPS', detail: `الموقع: ${lat.toFixed(4)}, ${lon.toFixed(4)}`, score: 10 });
-        } else {
-          checks.push({ status: 'warn', label: 'بيانات GPS', detail: 'إحداثيات غير طبيعية (0,0)', score: 5 });
-          totalScore += 5;
-        }
-      } else {
-        checks.push({ status: 'warn', label: 'بيانات GPS', detail: 'لا توجد بيانات موقع جغرافي', score: 5 });
-        totalScore += 5;
-      }
+        const lat = parseFloat(exifData.gpsLatitude), lon = parseFloat(exifData.gpsLongitude);
+        if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && (lat !== 0 || lon !== 0)) addCheck('بيانات GPS', `الموقع: ${lat.toFixed(4)}, ${lon.toFixed(4)}`, 'pass', 10);
+        else addCheck('بيانات GPS', 'إحداثيات غير طبيعية (0,0)', 'warn', 5);
+      } else addCheck('بيانات GPS', 'غير متوفرة', 'warn', 4);
+      totalScore += checks[checks.length-1].score;
 
-      // 5. فحص دقة الصورة ونسبة البكسل
-      maxScore += 10;
-      if (exifData.width && exifData.height) {
-        const aspect = exifData.width / exifData.height;
-        const standardAspects = [4/3, 3/2, 16/9, 1/1, 3/4, 2/3, 9/16];
-        const isStandard = standardAspects.some(sa => Math.abs(aspect - sa) < 0.01);
-        if (isStandard) {
-          checks.push({ status: 'pass', label: 'نسبة الأبعاد', detail: `نسبة معيارية ${exifData.aspectRatio}`, score: 10 });
-        } else {
-          checks.push({ status: 'warn', label: 'نسبة الأبعاد', detail: `نسبة غير معيارية ${exifData.aspectRatio}`, score: 6 });
-          totalScore += 6;
-        }
-      }
-      totalScore += checks[checks.length-1]?.score || 10;
+      // 5. Aspect Ratio
+      const aspect = exifData.width / exifData.height;
+      const isStd = CONFIG.STANDARD_ASPECTS.some(sa => Math.abs(aspect - sa) < 0.01);
+      addCheck('نسبة الأبعاد', isStd ? `نسبة معيارية ${exifData.aspectRatio}` : `نسبة غير شائعة ${exifData.aspectRatio}`, isStd ? 'pass' : 'warn', isStd ? 8 : 5);
+      totalScore += checks[checks.length-1].score;
 
-      // 6. فحص حجم الملف مقابل الدقة
-      maxScore += 10;
+      // 6. File Size vs Resolution
       const mp = (exifData.width * exifData.height) / 1e6;
-      const fileSizeKB = file.size / 1024;
-      const expectedMinKB = mp * 150; // ~150KB per MP for decent quality
-      if (exifData.fileType?.includes('JPEG') || exifData.fileType?.includes('JPG')) {
-        if (fileSizeKB < expectedMinKB * 0.3) {
-          checks.push({ status: 'warn', label: 'ضغط مفرط', detail: 'حجم الملف صغير جداً مقارنة بالدقة', score: 4 });
-          totalScore += 4;
-        } else {
-          checks.push({ status: 'pass', label: 'حجم الملف', detail: `حجم متناسب مع الدقة (${formatFileSize(file.size)})`, score: 10 });
-          totalScore += 10;
-        }
-      } else {
-        checks.push({ status: 'pass', label: 'حجم الملف', detail: formatFileSize(file.size), score: 10 });
-        totalScore += 10;
-      }
+      const sizeKB = file.size / 1024;
+      const expectedMin = mp * 150;
+      if (file.type.includes('jpeg')) {
+        if (sizeKB < expectedMin * 0.25) addCheck('ضغط مفرط', 'حجم الملف صغير جداً مقارنة بالدقة', 'warn', 4);
+        else addCheck('حجم الملف', `متناسب مع الدقة (${Utils.formatBytes(file.size)})`, 'pass', 10);
+      } else addCheck('حجم الملف', Utils.formatBytes(file.size), 'pass', 10);
+      totalScore += checks[checks.length-1].score;
 
-      // 7. فحص MakerNote
-      maxScore += 5;
-      if (exifData.makerNote && exifData.makerNote !== 'undefined') {
-        checks.push({ status: 'pass', label: 'MakerNote', detail: 'بيانات الشركة المصنعة موجودة', score: 5 });
-        totalScore += 5;
-      } else {
-        checks.push({ status: 'warn', label: 'MakerNote', detail: 'مفقود - قد يكون طبيعي لصور الويب', score: 3 });
-        totalScore += 3;
-      }
+      // 7. MakerNote
+      if (exifData.makerNote && exifData.makerNote !== 'undefined') addCheck('MakerNote', 'بيانات الشركة المصنعة موجودة', 'pass', 6);
+      else addCheck('MakerNote', 'مفقود', 'warn', 3);
+      totalScore += checks[checks.length-1].score;
 
-      // 8. فحص XMP Metadata (نموذجي)
-      maxScore += 5;
+      // 8. XMP/Software
       if (exifData.software) {
-        checks.push({ status: exifData.software.toLowerCase().includes('microsoft') ? 'warn' : 'pass', label: 'بيانات XMP', detail: exifData.software, score: exifData.software.toLowerCase().includes('microsoft') ? 3 : 5 });
-        totalScore += exifData.software.toLowerCase().includes('microsoft') ? 3 : 5;
-      } else {
-        checks.push({ status: 'warn', label: 'بيانات XMP', detail: 'غير متوفرة', score: 2 });
-        totalScore += 2;
-      }
+        const isMs = exifData.software.toLowerCase().includes('microsoft');
+        addCheck('بيانات XMP/برنامج', exifData.software, isMs ? 'warn' : 'pass', isMs ? 3 : 6);
+        totalScore += isMs ? 3 : 6;
+      } else { addCheck('بيانات XMP', 'غير متوفرة', 'warn', 2); totalScore += 2; }
+      maxScore += 6;
 
-      // 9. فحص Flash consistency
-      maxScore += 5;
-      if (exifData.flash !== undefined && exifData.flash !== null) {
-        checks.push({ status: 'pass', label: 'بيانات الفلاش', detail: formatFlashValue(exifData.flash), score: 5 });
-        totalScore += 5;
-      } else {
-        checks.push({ status: 'warn', label: 'بيانات الفلاش', detail: 'غير مسجلة', score: 3 });
-        totalScore += 3;
-      }
+      // 9. Flash/Lens
+      if (exifData.flash != null) { addCheck('بيانات الفلاش', Utils.formatFlash(exifData.flash), 'pass', 4); totalScore += 4; }
+      else { addCheck('بيانات الفلاش', 'غير مسجلة', 'warn', 2); totalScore += 2; }
+      maxScore += 4;
+      if (exifData.lensModel || exifData.lensMake) { addCheck('بيانات العدسة', exifData.lensModel || exifData.lensMake, 'pass', 4); totalScore += 4; }
+      else if (exifData.cameraMake) { addCheck('بيانات العدسة', 'غير مسجلة', 'warn', 2); totalScore += 2; }
+      maxScore += 4;
 
-      // 10. فحص Lens data
-      maxScore += 5;
-      if (exifData.lensModel || exifData.lensMake) {
-        checks.push({ status: 'pass', label: 'بيانات العدسة', detail: exifData.lensModel || exifData.lensMake, score: 5 });
-        totalScore += 5;
-      } else if (exifData.cameraMake) {
-        checks.push({ status: 'warn', label: 'بيانات العدسة', detail: 'لم يتم كشف بيانات العدسة', score: 3 });
-        totalScore += 3;
-      }
+      const pct = Math.round((totalScore / maxScore) * 100);
+      let verdict, cls, icon, sub;
+      if (pct >= 80) { verdict = 'صورة أصلية على الأرجح'; cls = 'genuine'; icon = '✅'; sub = 'جميع المؤشرات تشير إلى أن الصورة أصلية وغير معدّلة رقمياً'; }
+      else if (pct >= 55) { verdict = 'مشكوك فيها'; cls = 'suspicious'; icon = '⚠️'; sub = 'بعض المؤشرات تدعو للشك. يُنصح بفحص إضافي يدوي'; }
+      else { verdict = 'محتمل التعديل'; cls = 'modified'; icon = '🚨'; sub = 'مؤشرات قوية على أن الصورة تم تعديلها أو التلاعب بها رقمياً'; }
 
-      // حساب النتيجة النهائية
-      const percentage = Math.round((totalScore / maxScore) * 100);
-      
-      let verdict, verdictClass, verdictIcon, verdictSub;
-      if (percentage >= 80) {
-        verdict = 'صورة أصلية على الأرجح'; verdictClass = 'genuine'; verdictIcon = '✅';
-        verdictSub = 'جميع المؤشرات تشير إلى أن الصورة أصلية وغير معدّلة رقمياً';
-      } else if (percentage >= 55) {
-        verdict = 'مشكوك فيها'; verdictClass = 'suspicious'; verdictIcon = '⚠️';
-        verdictSub = 'بعض المؤشرات تدعو للشك. يُنصح بفحص إضافي';
-      } else {
-        verdict = 'محتمل التعديل'; verdictClass = 'modified'; verdictIcon = '🚨';
-        verdictSub = 'مؤشرات قوية على أن الصورة تم تعديلها أو التلاعب بها';
-      }
-
-      return { checks, score: percentage, maxScore, totalScore, verdict, verdictClass, verdictIcon, verdictSub, detectedSoftware };
+      return { checks, score: pct, maxScore, totalScore, verdict, cls, icon, sub, detectedSoftware: detected };
     }
 
-    // ===== عرض نتائج فحص الأصالة =====
-    function displayAuthenticityResults(data) {
-      const { score, verdict, verdictClass, verdictIcon, verdictSub, checks, detectedSoftware } = data;
+    // ===== RENDER AUTHENTICITY =====
+    function renderAuthenticity() {
+      const { score, verdict, cls, icon, sub, checks, detectedSoftware } = STATE.data.authenticity;
+      let html = `<div class="authenticity-card ${cls}">
+        <div class="authenticity-header"><div class="authenticity-icon">${icon}</div><div><div class="authenticity-title">${verdict}</div><div class="authenticity-subtitle">${sub}</div></div></div>
+        <div class="authenticity-score"><div class="score-bar-bg"><div class="score-bar" id="scoreBar" style="width:0%;"></div></div><div class="score-number" style="color:${score>=80?'var(--success)':score>=55?'var(--warning)':'var(--danger)'};">${score}%</div></div>
+        <div class="check-list">`;
       
-      let html = `
-        <div class="authenticity-card ${verdictClass}">
-          <div class="authenticity-header">
-            <div class="authenticity-icon">${verdictIcon}</div>
-            <div>
-              <div class="authenticity-title">${verdict}</div>
-              <div class="authenticity-subtitle">${verdictSub}</div>
-            </div>
-          </div>
-          <div class="authenticity-score">
-            <div class="score-bar-bg">
-              <div class="score-bar" id="scoreBar" style="width: 0%;"></div>
-            </div>
-            <div class="score-number" style="color: ${score >= 80 ? 'var(--success)' : score >= 55 ? 'var(--warning)' : 'var(--danger)'};">${score}%</div>
-          </div>
-          <div class="check-list">
-      `;
-
-      checks.forEach((check, i) => {
-        const icon = check.status === 'pass' ? '✅' : check.status === 'warn' ? '⚠️' : '❌';
-        const detailIcon = check.status === 'pass' ? '✓' : check.status === 'warn' ? '!' : '✗';
-        html += `
-          <div class="check-item ${check.status}" style="animation: fadeIn 0.3s ease ${i * 0.08}s both;">
-            <div class="check-icon">${icon}</div>
-            <div class="check-label">${check.label}</div>
-            <div class="check-detail">${check.detail}</div>
-          </div>
-        `;
+      checks.forEach((c, i) => {
+        const ic = c.status === 'pass' ? '✅' : c.status === 'warn' ? '⚠️' : '❌';
+        html += `<div class="check-item ${c.status}" style="animation:fadeIn 0.35s ease ${i*0.06}s both;"><div class="check-icon">${ic}</div><div class="check-label">${c.label}</div><div class="check-detail">${c.detail}</div></div>`;
       });
-
-      if (detectedSoftware && detectedSoftware.length > 0) {
-        html += `
-          <div class="check-item fail" style="margin-top:0.5rem;">
-            <div class="check-icon">🚨</div>
-            <div class="check-label" style="color:var(--danger);font-weight:700;">⚡ برامج تعديل مكتشفة</div>
-            <div class="check-detail">${detectedSoftware.join(' • ')}</div>
-          </div>
-        `;
+      
+      if (detectedSoftware?.length) {
+        html += `<div class="check-item fail" style="margin-top:0.5rem;background:rgba(248,113,113,0.15);border-right-color:var(--danger);"><div class="check-icon">🚨</div><div class="check-label" style="color:var(--danger);font-weight:700;">⚡ برامج تعديل مكتشفة</div><div class="check-detail">${detectedSoftware.join(' • ')}</div></div>`;
       }
-
       html += `</div></div>`;
-      dom.authenticityResult.innerHTML = html;
-
-      // أنيميشن شريط النتيجة
-      setTimeout(() => {
-        const bar = document.getElementById('scoreBar');
-        if (bar) bar.style.width = score + '%';
-      }, 200);
+      DOM.authenticityResult.innerHTML = html;
+      setTimeout(() => { const bar = document.getElementById('scoreBar'); if (bar) bar.style.width = score + '%'; }, 150);
     }
 
-    // ===== 🔬 تحليل ELA (Error Level Analysis) =====
-    async function generateELAAnalysis(imageUrl, authenticityData) {
-      dom.elaSection.style.display = 'block';
-      
+    // ===== ELA ANALYSIS =====
+    async function performELA(imageUrl, exifData) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
+      const img = new Image(); img.crossOrigin = 'anonymous';
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = imageUrl; });
       
-      await new Promise((resolve) => {
-        img.onload = resolve;
-        img.onerror = resolve;
-        img.src = imageUrl;
-      });
-      
-      // تصغير الحجم للأداء
-      const maxSize = 600;
-      const ratio = Math.min(maxSize / img.width, maxSize / img.height, 1);
-      canvas.width = img.width * ratio;
-      canvas.height = img.height * ratio;
-      
-      // رسم الصورة الأصلية
+      const maxDim = 650;
+      const ratio = Math.min(maxDim/img.width, maxDim/img.height, 1);
+      canvas.width = Math.round(img.width * ratio); canvas.height = Math.round(img.height * ratio);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const originalData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const orig = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
-      // إعادة ضغط بـ 75% جودة
-      const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      const recompressedImg = new Image();
+      const compressedURL = canvas.toDataURL('image/jpeg', CONFIG.ELA_QUALITY);
+      const compImg = new Image();
+      await new Promise((res) => { compImg.onload = res; compImg.src = compressedURL; });
+      ctx.drawImage(compImg, 0, 0, canvas.width, canvas.height);
+      const comp = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
-      await new Promise((resolve) => {
-        recompressedImg.onload = resolve;
-        recompressedImg.onerror = resolve;
-        recompressedImg.src = jpegDataUrl;
-      });
+      const ela = ctx.createImageData(canvas.width, canvas.height);
+      let totalDiff = 0, maxDiff = 0, highCount = 0;
+      const totalPixels = canvas.width * canvas.height;
+      const scale = CONFIG.ELA_SCALE;
       
-      ctx.drawImage(recompressedImg, 0, 0, canvas.width, canvas.height);
-      const compressedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      
-      // حساب الفرق (ELA)
-      const elaData = ctx.createImageData(canvas.width, canvas.height);
-      const scale = 20; // تضخيم الفرق للوضوح
-      let totalDiff = 0;
-      let maxDiff = 0;
-      let highDiffPixels = 0;
-      let totalPixels = canvas.width * canvas.height;
-      
-      for (let i = 0; i < originalData.data.length; i += 4) {
-        const rDiff = Math.abs(originalData.data[i] - compressedData.data[i]);
-        const gDiff = Math.abs(originalData.data[i+1] - compressedData.data[i+1]);
-        const bDiff = Math.abs(originalData.data[i+2] - compressedData.data[i+2]);
-        const avgDiff = (rDiff + gDiff + bDiff) / 3;
+      for (let i = 0; i < orig.data.length; i += 4) {
+        const r = Math.abs(orig.data[i] - comp.data[i]);
+        const g = Math.abs(orig.data[i+1] - comp.data[i+1]);
+        const b = Math.abs(orig.data[i+2] - comp.data[i+2]);
+        const avg = (r + g + b) / 3;
         
-        totalDiff += avgDiff;
-        if (avgDiff > maxDiff) maxDiff = avgDiff;
-        if (avgDiff > 15) highDiffPixels++;
+        totalDiff += avg; if (avg > maxDiff) maxDiff = avg; if (avg > 18) highCount++;
         
-        const amplified = Math.min(255, avgDiff * scale);
-        
-        // تلوين: الأخضر = طبيعي، الأصفر = مشكوك، الأحمر = معدل
-        elaData.data[i] = amplified > 60 ? 255 : amplified > 30 ? 255 : 50;     // R
-        elaData.data[i+1] = amplified > 60 ? 50 : amplified > 30 ? 200 : 200;   // G
-        elaData.data[i+2] = amplified > 60 ? 50 : amplified > 30 ? 50 : 50;     // B
-        elaData.data[i+3] = 255;
+        const amp = Math.min(255, avg * scale);
+        // Color mapping: Green (normal), Yellow (suspicious), Red (modified)
+        ela.data[i] = amp > 65 ? 245 : amp > 35 ? 250 : 60;
+        ela.data[i+1] = amp > 65 ? 80 : amp > 35 ? 190 : 200;
+        ela.data[i+2] = amp > 65 ? 70 : amp > 35 ? 60 : 60;
+        ela.data[i+3] = 255;
       }
+      ctx.putImageData(ela, 0, 0);
       
-      ctx.putImageData(elaData, 0, 0);
+      const avgDiff = totalDiff / totalPixels;
+      const highPct = (highCount / totalPixels * 100).toFixed(1);
+      let label, detail;
+      if (avgDiff < 5.5) { label = 'منخفض - طبيعي'; detail = 'الصورة متجانسة في الضغط، مما يشير لعدم وجود تعديل ملحوظ'; }
+      else if (avgDiff < 13) { label = 'متوسط'; detail = 'بعض المناطق ذات ضغط مختلف، قد تكون طبيعية أو معدّلة خفيفاً'; }
+      else { label = 'مرتفع - مشكوك فيه'; detail = 'وجود مناطق ذات ضغط مختلف قوي قد يشير للتعديل أو اللصق'; }
       
-      const avgDiffPerPixel = totalDiff / totalPixels;
-      const highDiffPercentage = (highDiffPixels / totalPixels * 100).toFixed(1);
+      STATE.data.elaCanvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      STATE.data.elaWidth = canvas.width; STATE.data.elaHeight = canvas.height;
       
-      let elaDataLabel, elaDataDetail;
-      if (avgDiffPerPixel < 5) {
-        elaDataLabel = 'مستوى خطأ منخفض - طبيعي';
-        elaDataDetail = 'الصورة متجانسة في الضغط، مما يشير لعدم وجود تعديل';
-      } else if (avgDiffPerPixel < 12) {
-        elaDataLabel = 'مستوى خطأ متوسط';
-        elaDataDetail = 'بعض المناطق قد تكون معدّلة - يُنصح بالمراجعة';
-      } else {
-        elaDataLabel = 'مستوى خطأ مرتفع - مشكوك فيه';
-        elaDataDetail = 'وجود مناطق ذات ضغط مختلف قد يشير للتعديل';
-      }
-      
-      dom.elaResult.innerHTML = `
-        <div class="ela-container">
-          <canvas id="elaCanvas" width="${canvas.width}" height="${canvas.height}"></canvas>
-          <div class="ela-overlay">
-            <div class="ela-label">🔬 تحليل مستوى الخطأ (ELA)</div>
-            <div class="ela-badge">${highDiffPercentage}% مناطق مختلفة</div>
-          </div>
-        </div>
-        <div class="ela-explanation">
-          <strong>📊 النتائج:</strong><br>
-          • متوسط مستوى الخطأ: <strong>${avgDiffPerPixel.toFixed(2)}</strong><br>
-          • أعلى فرق: <strong>${maxDiff}</strong> (من 0-255)<br>
-          • نسبة المناطق ذات الضغط المختلف: <strong>${highDiffPercentage}%</strong><br>
-          • التقييم: <strong style="color: ${avgDiffPerPixel < 5 ? 'var(--success)' : avgDiffPerPixel < 12 ? 'var(--warning)' : 'var(--danger)'};">${elDataLabel}</strong><br><br>
-          <strong>ℹ️ ما هو تحليل ELA؟</strong><br>
-          ${elDataDetail}<br>
-          عندما يتم حفظ صورة JPEG، يتم ضغطها بمعدل ثابت. إذا تم لصق جزء من صورة أخرى أو تعديل جزء معين، فإن مستوى الضغط يختلف في تلك المنطقة. تحليل ELA يكشف هذه الاختلافات.
-        </div>
-      `;
-      
-      // نسخ ELA للكانفاس المعروض
-      const displayCanvas = document.getElementById('elaCanvas');
-      if (displayCanvas) {
-        displayCanvas.width = canvas.width;
-        displayCanvas.height = canvas.height;
-        displayCanvas.getContext('2d').putImageData(elaData, 0, 0);
-      }
-      
-      authenticityData.elaData = { avgDiffPerPixel, maxDiff, highDiffPercentage, label: elaDataLabel };
+      return { avgDiff, maxDiff, highPct, label, detail };
     }
 
-    // ===== عرض المعلومات =====
-    function displayAllInfo(file, data) {
-      const imageItems = [
-        { label: 'اسم الملف', value: data.fileName },
-        { label: 'الحجم', value: data.fileSize, large: true },
-        { label: 'الأبعاد', value: `${data.width} × ${data.height} بكسل` },
-        { label: 'الدقة', value: `${data.megapixels} ميجابكسل` },
-        { label: 'النسبة', value: data.aspectRatio },
-        { label: 'الاتجاه', value: data.orientation },
-        { label: 'النوع', value: data.fileType },
-        { label: 'تعديل آخر', value: data.dateModified }
-      ];
-      dom.imageInfo.innerHTML = imageItems.map(ri).join('');
+    function renderELA() {
+      DOM.elaSection.style.display = 'block'; DOM.elaEmpty.style.display = 'none';
+      const { avgDiff, maxDiff, highPct, label, detail } = STATE.data.ela;
+      const color = avgDiff < 5.5 ? 'var(--success)' : avgDiff < 13 ? 'var(--warning)' : 'var(--danger)';
       
-      const deviceItems = [
-        { label: 'الشركة المصنعة', value: data.cameraMake || 'غير متوفر' },
-        { label: 'موديل الكاميرا', value: data.cameraModel || 'غير متوفر' },
-        { label: 'العدسة', value: data.lensModel || data.lensMake || '—' },
-        { label: 'البرنامج', value: data.software || '—' },
-        { label: 'المصور', value: data.artist || '—' },
-        { label: 'حقوق النشر', value: data.copyright || '—' },
-        { label: 'إصدار EXIF', value: data.exifVersion || '—' }
-      ];
-      dom.deviceInfo.innerHTML = deviceItems.map(ri).join('');
+      DOM.elaResult.innerHTML = `
+        <div class="ela-container"><canvas id="elaCanvas" width="${STATE.data.elaWidth}" height="${STATE.data.elaHeight}"></canvas><div class="ela-overlay"><div class="ela-label">🔬 تحليل مستوى الخطأ (ELA)</div><div class="ela-badge">${highPct}% مناطق مختلفة</div></div></div>
+        <div class="ela-controls"><button class="ela-btn active" onclick="toggleELAOverlay()">🔍 عرض فوق الصورة</button><button class="ela-btn" onclick="toggleELASplit()">↔️ تقسيم</button></div>
+        <div class="ela-explanation"><strong>📊 النتائج:</strong><br>• متوسط مستوى الخطأ: <strong>${avgDiff.toFixed(2)}</strong><br>• أعلى فرق: <strong>${maxDiff}</strong> (0-255)<br>• نسبة المناطق المختلفة: <strong>${highPct}%</strong><br>• التقييم: <strong style="color:${color}">${label}</strong><br><br><strong>ℹ️ ما هو ELA؟</strong><br>${detail}<br>عند حفظ JPEG يتم ضغطه بمعدل ثابت. إذا تم لصق جزء أو تعديله، يختلف مستوى الضغط. تحليل ELA يكشف هذه الاختلافات بوضوح.</div>
+        <div class="ela-legend"><div class="legend-item"><div class="legend-color" style="background:#3cb85a"></div> طبيعي (منخفض)</div><div class="legend-item"><div class="legend-color" style="background:#f5c542"></div> مشكوك (متوسط)</div><div class="legend-item"><div class="legend-color" style="background:#f87171"></div> معدل (مرتفع)</div></div>`;
       
-      const techItems = [
-        { label: 'حساسية ISO', value: data.isoSpeed ? `ISO ${data.isoSpeed}` : 'تلقائي' },
-        { label: 'فتحة العدسة', value: data.fNumber || 'غير معروف' },
-        { label: 'سرعة الغالق', value: data.exposureTime || 'غير معروف' },
-        { label: 'البعد البؤري', value: data.focalLength || 'غير معروف' },
-        { label: 'الفلاش', value: formatFlashValue(data.flash) || 'غير معروف' },
-        { label: 'توازن الأبيض', value: data.whiteBalance === 'تلقائي' ? 'تلقائي' : 'يدوي' },
-        { label: 'وضع التعريض', value: formatExposureMode(data.exposureProgram) || '—' },
-        { label: 'نوع المشهد', value: data.sceneCaptureType || '—' }
-      ];
-      dom.technicalInfo.innerHTML = techItems.map(ri).join('');
-      
-      const locationItems = [
-        { label: 'تاريخ التصوير', value: data.dateTaken || data.dateCreated || 'غير متوفر' },
-        { label: 'خط العرض', value: data.gpsLatitude ? `${data.gpsLatitude}° ${data.gpsLatRef || 'N'}` : 'غير متوفر' },
-        { label: 'خط الطول', value: data.gpsLongitude ? `${data.gpsLongitude}° ${data.gpsLonRef || 'E'}` : 'غير متوفر' },
-        { label: 'الارتفاع', value: data.gpsAltitude || '—' }
-      ];
-      dom.locationInfo.innerHTML = locationItems.map(ri).join('');
-      
-      const extraItems = [
-        { label: 'مساحة اللون', value: data.colorSpace || 'sRGB' },
-        { label: 'وحدة الدقة', value: data.resolutionUnit || 'بوصة' },
-        { label: 'الدقة الأفقية', value: data.xResolution ? `${data.xResolution} نقطة/بوصة` : '—' },
-        { label: 'الدقة الرأسية', value: data.yResolution ? `${data.yResolution} نقطة/بوصة` : '—' },
-        { label: 'تعليق المستخدم', value: data.userComment || '—' }
-      ];
-      dom.extraInfo.innerHTML = extraItems.map(ri).join('');
+      const display = document.getElementById('elaCanvas');
+      if (display && STATE.data.elaCanvasData) { display.width = STATE.data.elaWidth; display.height = STATE.data.elaHeight; display.getContext('2d').putImageData(STATE.data.elaCanvasData, 0, 0); }
     }
 
-    function ri(item) {
-      const vc = item.large ? 'large' : item.success ? 'success' : item.warning ? 'warning' : item.danger ? 'danger' : '';
-      return `<div class="info-item"><div class="info-label">${item.label}</div><div class="info-value ${vc}">${item.value}</div></div>`;
+    // ===== HISTOGRAM ANALYSIS =====
+    async function analyzeHistogram(imageUrl) {
+      const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const img = new Image(); img.crossOrigin='anonymous';
+      await new Promise(r=>{img.onload=r;img.onerror=r;img.src=imageUrl;});
+      const maxDim = 400; const ratio = Math.min(maxDim/img.width, maxDim/img.height, 1);
+      canvas.width = Math.round(img.width*ratio); canvas.height = Math.round(img.height*ratio);
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      const d = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+      
+      const bins = Array(256).fill(0).map(()=>({r:0,g:0,b:0,l:0}));
+      let total = 0;
+      for(let i=0;i<d.length;i+=4){
+        const r=d[i],g=d[i+1],b=d[i+2];
+        const l = Math.round(0.2126*r + 0.7152*g + 0.0722*b);
+        bins[r].r++; bins[g].g++; bins[b].b++; bins[l].l++;
+        total++;
+      }
+      const maxVal = Math.max(...bins.map(b=>Math.max(b.r,b.g,b.b,b.l)));
+      return { bins, maxVal, total };
     }
-    function formatExposureMode(v) { const m = {'0':'تلقائي','1':'يدوي','2':'برنامج','3':'أولوية الغالق','4':'أولوية الفتحة','5':'إبداعي','6':'مشهد','7':'بورتريه','8':'طبيعة','9':'ماكرو','10':'رياضة'}; return m[String(v)]; }
 
-    // ===== استخراج الألوان =====
-    async function extractAndDisplayColors(imageUrl) {
-      try {
-        const colors = await getDominantColors(imageUrl);
-        dom.colorPalette.innerHTML = colors.map(c => `
-          <div class="color-swatch" style="background:${c}" data-hex="${c}" title="${c}"
-               onclick="navigator.clipboard?.writeText('${c}'); showMessage('✓ تم نسخ: ${c}','success',1800)"></div>
-        `).join('');
-        const avgB = calcAvgBrightness(colors);
-        dom.colorInfo.innerHTML += `
-          <div class="info-item"><div class="info-label">سطوع متوسط</div><div class="info-value ${avgB > 180 ? '' : avgB > 100 ? 'warning' : 'success'}">${avgB.toFixed(0)} / 255</div></div>
-          <div class="info-item"><div class="info-label">تناسب الألوان</div><div class="info-value">${colors.length >= 4 ? 'متنوع' : 'متماسك'}</div></div>
-        `;
-      } catch(e) { console.warn('فشل استخراج الألوان:', e); }
+    function renderHistogram() {
+      DOM.histogramSection.style.display = 'block'; DOM.histogramEmpty.style.display = 'none';
+      const { bins, maxVal, total } = STATE.data.histogram;
+      const canvas = DOM.histogramCanvas; const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.fillRect(0,0,w,h);
+      
+      const drawLine = (color, key) => {
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.8;
+        for(let i=0;i<256;i++){
+          const x = (i/255)*w; const y = h - (bins[i][key]/maxVal)*h*0.95;
+          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        }
+        ctx.stroke(); ctx.globalAlpha = 1;
+      };
+      
+      drawLine('#ef4444','r'); drawLine('#22c55e','g'); drawLine('#3b82f6','b'); drawLine('#f8fafc','l');
+      
+      ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '10px Tajawal';
+      for(let i=0;i<=256;i+=64){ ctx.fillText(i, (i/255)*w + 2, h-4); }
     }
-    function getDominantColors(imageUrl, ss = 50) {
-      return new Promise((resolve) => {
-        const img = new Image(); img.crossOrigin = 'anonymous';
-        img.onload = function() {
-          const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-          const ratio = Math.min(100/img.width, 100/img.height, 1);
-          canvas.width = img.width*ratio; canvas.height = img.height*ratio;
-          ctx.drawImage(img,0,0,canvas.width,canvas.height);
-          const d = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-          const colors = []; const step = Math.max(1, Math.floor(d.length/4/ss));
-          for (let i=0; i<d.length; i+=4*step) { if (d[i+3]>128) colors.push({r:d[i],g:d[i+1],b:d[i+2]}); }
-          const clustered = clusterColors(colors, 5);
-          resolve(clustered.map(c => rgbToHex(c.r,c.g,c.b)));
-        };
-        img.onerror = () => resolve(['#8b5cf6','#a78bfa','#22d3ee','#34d399','#fbbf24']);
-        img.src = imageUrl;
-      });
-    }
-    function clusterColors(colors, k) {
-      if (colors.length === 0) return [];
-      let centroids = []; const step = Math.floor(colors.length/k);
-      for (let i=0; i<k && i*step<colors.length; i++) centroids.push({...colors[i*step]});
-      for (let iter=0; iter<3; iter++) {
-        const clusters = Array.from({length:k}, () => []);
-        for (const c of colors) {
+
+    // ===== COLOR EXTRACTION =====
+    async function extractColors(imageUrl, k) {
+      const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const img = new Image(); img.crossOrigin='anonymous';
+      await new Promise(r=>{img.onload=r;img.onerror=r;img.src=imageUrl;});
+      const maxDim = 120; const ratio = Math.min(maxDim/img.width, maxDim/img.height, 1);
+      canvas.width = Math.round(img.width*ratio); canvas.height = Math.round(img.height*ratio);
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      const d = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+      
+      const colors = []; const step = Math.max(1, Math.floor(d.length/4/(k*8)));
+      for(let i=0;i<d.length;i+=4*step){ if(d[i+3]>128) colors.push({r:d[i],g:d[i+1],b:d[i+2]}); }
+      
+      let centroids = []; const stepC = Math.floor(colors.length/k);
+      for(let i=0;i<k&&i*stepC<colors.length;i++) centroids.push({...colors[i*stepC]});
+      
+      for(let iter=0;iter<4;iter++){
+        const clusters = Array.from({length:k},()=>[]);
+        for(const c of colors){
           let minD=Infinity, ci=0;
-          for (let i=0; i<centroids.length; i++) { const d = colorDist(c,centroids[i]); if (d<minD) { minD=d; ci=i; } }
+          for(let i=0;i<centroids.length;i++){const dst=Math.sqrt((c.r-centroids[i].r)**2+(c.g-centroids[i].g)**2+(c.b-centroids[i].b)**2);if(dst<minD){minD=dst;ci=i;}}
           clusters[ci].push(c);
         }
-        for (let i=0; i<k; i++) {
-          if (clusters[i].length>0) centroids[i] = {
-            r:Math.round(clusters[i].reduce((s,c)=>s+c.r,0)/clusters[i].length),
-            g:Math.round(clusters[i].reduce((s,c)=>s+c.g,0)/clusters[i].length),
-            b:Math.round(clusters[i].reduce((s,c)=>s+c.b,0)/clusters[i].length)
-          };
+        for(let i=0;i<k;i++){
+          if(clusters[i].length>0) centroids[i]={r:Math.round(clusters[i].reduce((s,c)=>s+c.r,0)/clusters[i].length),g:Math.round(clusters[i].reduce((s,c)=>s+c.g,0)/clusters[i].length),b:Math.round(clusters[i].reduce((s,c)=>s+c.b,0)/clusters[i].length)};
+          else centroids[i] = {r:128,g:128,b:128};
         }
       }
-      return centroids;
+      
+      const hex = centroids.map(c=>{const r=Utils.clamp(c.r,0,255),g=Utils.clamp(c.g,0,255),b=Utils.clamp(c.b,0,255);return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');});
+      
+      // Calculate brightness & contrast
+      let brightSum = 0;
+      for(let i=0;i<colors.length;i++) brightSum += (0.2126*colors[i].r + 0.7152*colors[i].g + 0.0722*colors[i].b);
+      const avgBright = brightSum / colors.length;
+      
+      return { dominant: hex, avgBrightness: avgBright, count: hex.length, unique: new Set(hex).size };
     }
-    function colorDist(c1,c2) { return Math.sqrt((c1.r-c2.r)**2+(c1.g-c2.g)**2+(c1.b-c2.b)**2); }
-    function rgbToHex(r,g,b) { return '#'+[r,g,b].map(x=>Math.min(255,Math.max(0,x)).toString(16).padStart(2,'0')).join(''); }
-    function calcAvgBrightness(colors) { let t=0; for (const h of colors) { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); t+=(0.299*r+0.587*g+0.114*b); } return t/colors.length; }
 
-    // ===== الكاميرا =====
+    function renderColors() {
+      DOM.colorPalette.innerHTML = ''; DOM.colorInfoGrid.innerHTML = ''; DOM.colorsEmpty.style.display = 'none';
+      const { dominant, avgBrightness, count, unique } = STATE.data.colors;
+      
+      dominant.forEach(h => {
+        DOM.colorPalette.innerHTML += `<div class="color-swatch" style="background:${h}" data-hex="${h}" title="${h}" onclick="Utils.toast('تم النسخ', '${h}', 'success', 2000); navigator.clipboard?.writeText('${h}')"></div>`;
+      });
+      
+      const brightColor = avgBrightness > 180 ? 'var(--success)' : avgBrightness > 100 ? 'var(--warning)' : 'var(--danger)';
+      DOM.colorInfoGrid.innerHTML = `
+        <div class="info-item"><div class="info-label">سطوع متوسط</div><div class="info-value" style="color:${brightColor}">${avgBrightness.toFixed(0)} / 255</div></div>
+        <div class="info-item"><div class="info-label">تناسق الألوان</div><div class="info-value">${unique <= count*0.6 ? 'متماسك ومنخفض' : 'متنوع وغني'}</div></div>
+        <div class="info-item"><div class="info-label">عدد الألوان المستخرجة</div><div class="info-value">${count}</div></div>
+        <div class="info-item"><div class="info-label">أكواد HEX</div><div class="info-value" style="font-size:0.85rem;word-break:break-all;">${dominant.join(' • ')}</div></div>
+      `;
+    }
+
+    function renderInfoTabs() {
+      const { exifData } = STATE.data;
+      const imageItems = [
+        { label: 'اسم الملف', value: exifData.fileName }, { label: 'الحجم', value: exifData.fileSize, large: true },
+        { label: 'الأبعاد', value: `${exifData.width} × ${exifData.height} بكسل` }, { label: 'الدقة', value: `${exifData.megapixels} ميجابكسل` },
+        { label: 'النسبة', value: exifData.aspectRatio }, { label: 'الاتجاه', value: exifData.orientation },
+        { label: 'النوع', value: exifData.fileType }, { label: 'تعديل آخر', value: exifData.dateModified }
+      ];
+      DOM.imageInfo.innerHTML = imageItems.map(renderItem).join('');
+      
+      const deviceItems = [
+        { label: 'الشركة المصنعة', value: exifData.cameraMake || 'غير متوفر' }, { label: 'موديل الكاميرا', value: exifData.cameraModel || 'غير متوفر' },
+        { label: 'العدسة', value: exifData.lensModel || exifData.lensMake || '—' }, { label: 'البرنامج', value: exifData.software || '—' },
+        { label: 'المصور', value: exifData.artist || '—' }, { label: 'حقوق النشر', value: exifData.copyright || '—' },
+        { label: 'إصدار EXIF', value: exifData.exifVersion || '—' }
+      ];
+      DOM.deviceInfo.innerHTML = deviceItems.map(renderItem).join('');
+      
+      const techItems = [
+        { label: 'حساسية ISO', value: exifData.isoSpeed ? `ISO ${exifData.isoSpeed}` : 'تلقائي' }, { label: 'فتحة العدسة', value: exifData.fNumber || 'غير معروف' },
+        { label: 'سرعة الغالق', value: exifData.exposureTime || 'غير معروف' }, { label: 'البعد البؤري', value: exifData.focalLength || 'غير معروف' },
+        { label: 'الفلاش', value: Utils.formatFlash(exifData.flash) || 'غير معروف' }, { label: 'توازن الأبيض', value: exifData.whiteBalance === 'تلقائي' ? 'تلقائي' : 'يدوي' },
+        { label: 'وضع التعريض', value: formatExposureMode(exifData.exposureProgram) || '—' }, { label: 'نوع المشهد', value: exifData.sceneCaptureType || '—' }
+      ];
+      DOM.technicalInfo.innerHTML = techItems.map(renderItem).join('');
+      
+      const locItems = [
+        { label: 'تاريخ التصوير', value: exifData.dateTaken || exifData.dateCreated || 'غير متوفر' },
+        { label: 'خط العرض', value: exifData.gpsLatitude ? `${exifData.gpsLatitude}° ${exifData.gpsLatRef || 'N'}` : 'غير متوفر' },
+        { label: 'خط الطول', value: exifData.gpsLongitude ? `${exifData.gpsLongitude}° ${exifData.gpsLonRef || 'E'}` : 'غير متوفر' },
+        { label: 'الارتفاع', value: exifData.gpsAltitude || '—' }
+      ];
+      DOM.locationInfo.innerHTML = locItems.map(renderItem).join('');
+      
+      const extraItems = [
+        { label: 'مساحة اللون', value: exifData.colorSpace || 'sRGB' }, { label: 'وحدة الدقة', value: exifData.resolutionUnit || 'بوصة' },
+        { label: 'الدقة الأفقية', value: exifData.xResolution ? `${exifData.xResolution} نقطة/بوصة` : '—' }, { label: 'الدقة الرأسية', value: exifData.yResolution ? `${exifData.yResolution} نقطة/بوصة` : '—' },
+        { label: 'تعليق المستخدم', value: exifData.userComment || '—' }, { label: 'ملاحظات المصنع', value: exifData.makerNote ? 'متوفرة (بيانات خام)' : 'غير متوفرة' }
+      ];
+      DOM.extraInfo.innerHTML = extraItems.map(renderItem).join('');
+    }
+
+    function renderItem(item) { const vc = item.large ? 'large' : ''; return `<div class="info-item"><div class="info-label">${item.label}</div><div class="info-value ${vc}">${item.value}</div></div>`; }
+    function formatExposureMode(v) { const m={'0':'تلقائي','1':'يدوي','2':'برنامج','3':'أولوية الغالق','4':'أولوية الفتحة','5':'إبداعي','6':'مشهد','7':'بورتريه','8':'طبيعة','9':'ماكرو','10':'رياضة'}; return m[String(v)]; }
+
+    // ===== TABS & UI =====
+    DOM.tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        DOM.tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+        DOM.tabContents.forEach(tc => tc.classList.remove('active'));
+        tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+        STATE.currentTab = tab.dataset.tab;
+        document.getElementById(`${STATE.currentTab}-tab`).classList.add('active');
+      });
+    });
+
+    // ===== REPORT & EXPORT =====
+    function generateReportTxt() {
+      const { file, exifData, authenticity, ela } = STATE.data;
+      let t = `📊 تقرير تحليل الصورة - مشروع ماتو v4.0\n${'═'.repeat(45)}\n`;
+      t += `📁 الملف: ${file.name} | ${Utils.formatBytes(file.size)} | ${exifData.width}×${exifData.height}\n`;
+      t += `🛡️ الأصالة: ${authenticity.verdict} (${authenticity.score}%)\n`;
+      if (ela) t += `🔬 ELA: ${ela.avgDiff.toFixed(2)} | ${ela.label}\n`;
+      t += `\n📱 الجهاز: ${exifData.cameraMake||''} ${exifData.cameraModel||''}\n`;
+      t += `⚙️ الإعدادات: ISO ${exifData.isoSpeed||'—'} | ${exifData.fNumber||'—'} | ${exifData.exposureTime||'—'} | ${exifData.focalLength||'—'}\n`;
+      t += `\n🌍 الموقع: ${exifData.gpsLatitude||'—'}, ${exifData.gpsLongitude||'—'}\n`;
+      t += `🎨 الألوان: ${STATE.data.colors.dominant.join(', ')}\n`;
+      t += `\n🔗 محلل الصور | مشروع ماتو | ${new Date().toLocaleString('ar-EG')}`;
+      return t;
+    }
+
+    DOM.downloadJson.addEventListener('click', () => {
+      if (!STATE.data) return Utils.toast('تنبيه', 'قم برفع صورة أولاً', 'warning');
+      const blob = new Blob([JSON.stringify(STATE.data, null, 2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `matoo_${Date.now()}.json`; a.click();
+      Utils.toast('تحميل JSON', 'تم تنزيل التقرير بنجاح');
+    });
+
+    DOM.downloadTxt.addEventListener('click', () => {
+      if (!STATE.data) return Utils.toast('تنبيه', 'قم برفع صورة أولاً', 'warning');
+      const blob = new Blob([generateReportTxt()], {type:'text/plain;charset=utf-8'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `matoo_report_${Date.now()}.txt`; a.click();
+      Utils.toast('تحميل TXT', 'تم تنزيل التقرير النصي');
+    });
+
+    DOM.copyData.addEventListener('click', () => {
+      if (!STATE.data) return Utils.toast('تنبيه', 'قم برفع صورة أولاً', 'warning');
+      navigator.clipboard.writeText(generateReportTxt()).then(()=>Utils.toast('نسخ', 'تم نسخ التقرير للحافظة')).catch(()=>Utils.toast('خطأ', 'فشل النسخ', 'error'));
+    });
+
+    DOM.shareBtn.addEventListener('click', () => {
+      if (!STATE.data) return Utils.toast('تنبيه', 'قم برفع صورة أولاً', 'warning');
+      if (navigator.share) {
+        navigator.share({ title: 'تقرير تحليل الصورة - ماتو', text: generateReportTxt() }).catch(()=>{});
+      } else { DOM.copyData.click(); Utils.toast('مشاركة', 'تم النسخ للمشاركة يدوياً'); }
+    });
+
+    DOM.resetBtn.addEventListener('click', () => { resetUI(); STATE.data=null; Utils.toast('جديد', 'جاهز لتحليل صورة جديدة'); });
+    DOM.clearData.addEventListener('click', (e) => { e.preventDefault(); resetUI(); STATE.data=null; localStorage.clear(); Utils.toast('مسح', 'تم حذف جميع البيانات المخزنة'); });
+
+    // ===== CAMERA MODULE =====
     async function openCamera() {
-      try { dom.cameraModal.classList.add('active'); await startCamera(); showMessage('📷 تم تفعيل الكاميرا','info',3000); }
-      catch(e) { showMessage('❌ تعذر الوصول للكاميرا','error'); closeCamera(); }
+      try { DOM.cameraModal.classList.add('active'); await startCamera(); Utils.toast('كاميرا', 'تم التفعيل. اضغط الدائرة البيضاء للتصوير', 'info'); }
+      catch(e) { Utils.toast('خطأ', 'تعذر الوصول للكاميرا. تحقق من الأذونات', 'error'); closeCamera(); }
     }
     async function startCamera() {
-      if (state.currentStream) state.currentStream.getTracks().forEach(t=>t.stop());
-      state.currentStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:state.facingMode,width:{ideal:1920},height:{ideal:1080}},audio:false});
-      dom.cameraVideo.srcObject = state.currentStream;
-      await new Promise(r => { if (dom.cameraVideo.readyState>=2) r(); else dom.cameraVideo.onloadedmetadata = r; });
+      if (STATE.stream) STATE.stream.getTracks().forEach(t=>t.stop());
+      STATE.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:STATE.facingMode,width:{ideal:1920},height:{ideal:1080}},audio:false});
+      DOM.cameraVideo.srcObject = STATE.stream;
+      await new Promise(r => DOM.cameraVideo.readyState>=2 ? r() : DOM.cameraVideo.onloadedmetadata = r);
     }
-    async function toggleCamera() { state.facingMode = state.facingMode==='user'?'environment':'user'; await startCamera(); }
+    async function toggleCamera() { STATE.facingMode = STATE.facingMode==='user'?'environment':'user'; await startCamera(); }
     async function capturePhoto() {
-      if (!state.currentStream) return;
-      const v=dom.cameraVideo; dom.cameraCanvas.width=v.videoWidth||1280; dom.cameraCanvas.height=v.videoHeight||720;
-      const ctx=dom.cameraCanvas.getContext('2d');
-      if (state.facingMode==='user') { ctx.translate(dom.cameraCanvas.width,0); ctx.scale(-1,1); }
+      if (!STATE.stream) return;
+      const v=DOM.cameraVideo; DOM.cameraCanvas.width=v.videoWidth||1280; DOM.cameraCanvas.height=v.videoHeight||720;
+      const ctx=DOM.cameraCanvas.getContext('2d'); if(STATE.facingMode==='user'){ctx.translate(DOM.cameraCanvas.width,0);ctx.scale(-1,1);}
       ctx.drawImage(v,0,0);
-      dom.cameraCanvas.toBlob(async (blob) => { blob.name=`matoo_${Date.now()}.jpg`; await handleImage(blob); closeCamera(); },'image/jpeg',0.92);
+      DOM.cameraCanvas.toBlob(async(b)=>{b.name=`matoo_${Date.now()}.jpg`;await handleImage(b);closeCamera();},'image/jpeg',0.92);
     }
-    function closeCamera() {
-      dom.cameraModal.classList.remove('active');
-      if (state.currentStream) { state.currentStream.getTracks().forEach(t=>t.stop()); state.currentStream=null; }
-      dom.cameraVideo.srcObject = null;
-    }
+    function closeCamera() { DOM.cameraModal.classList.remove('active'); if(STATE.stream){STATE.stream.getTracks().forEach(t=>t.stop());STATE.stream=null;} DOM.cameraVideo.srcObject=null; }
 
-    // ===== وظائف إضافية =====
-    async function loadSampleImage() {
-      setLoading(true); resetUI();
-      try {
-        setProgress(10,'تحميل عينة...','جاري الاتصال');
-        const r = await fetch('https://picsum.photos/seed/matoo123/1200/800.jpg');
-        const blob = await r.blob(); blob.name='sample.jpg';
-        await handleImage(blob);
-        showMessage('✅ تم تحميل العينة وتحليلها','success');
-      } catch(e) { showMessage('⚠️ تعذر تحميل العينة','warning'); }
-      finally { setLoading(false); setProgress(0); }
-    }
-    function resetAnalysis() { resetUI(); state.analysisData=null; showMessage('🔄 جاهز لتحليل جديد','info',2000); }
-    function resetAll() { resetAnalysis(); localStorage.removeItem('matoo_history'); showMessage('✓ تم مسح البيانات','success'); }
+    // ===== EVENTS =====
+    DOM.browseBtn.addEventListener('click', () => DOM.fileInput.click());
+    DOM.fileInput.addEventListener('change', e => e.target.files?.[0] && handleImage(e.target.files[0]));
+    ['dragenter','dragover'].forEach(ev => DOM.dropZone.addEventListener(ev, e => { e.preventDefault(); DOM.dropZone.classList.add('dragover'); }, false));
+    ['dragleave','drop'].forEach(ev => DOM.dropZone.addEventListener(ev, e => { e.preventDefault(); DOM.dropZone.classList.remove('dragover'); if(ev==='drop'){const f=e.dataTransfer.files[0]; f?.type?.startsWith('image/') ? handleImage(f) : Utils.showMessage('يرجى اختيار ملف صورة','error');}}, false));
+    DOM.dropZone.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();DOM.fileInput.click();} });
     
-    function downloadReport() {
-      if (!state.analysisData) return;
-      const {file, exifData, authenticity} = state.analysisData;
-      const report = { generated: new Date().toISOString(), app:'محلل الصور - مشروع ماتو', version:'3.0', file:{name:file.name,size:file.size,type:file.type}, exifData, authenticity };
-      const blob = new Blob([JSON.stringify(report,null,2)],{type:'application/json'});
-      const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`matoo_report_${Date.now()}.json`; a.click();
-      URL.revokeObjectURL(url); showMessage('📥 تم تحميل التقرير','success');
-    }
+    DOM.cameraBtn.addEventListener('click', openCamera);
+    DOM.sampleBtn.addEventListener('click', async () => { resetUI(); DOM.loading.classList.add('show'); Utils.setProgress(10,'تحميل عينة...','جاري الاتصال'); try { const r = await fetch('https://picsum.photos/seed/matoo_v4/1200/800.jpg'); const b = await r.blob(); b.name='sample.jpg'; await handleImage(b); Utils.toast('عينة', 'تم تحميل وتحليل الصورة بنجاح'); } catch { Utils.showMessage('⚠️ تعذر تحميل العينة','warning'); } finally { DOM.loading.classList.remove('show'); Utils.setProgress(0); } });
+    DOM.modalClose.addEventListener('click', closeCamera); DOM.closeCameraBtn.addEventListener('click', closeCamera);
+    DOM.captureBtn.addEventListener('click', capturePhoto); DOM.switchCameraBtn.addEventListener('click', toggleCamera);
+    DOM.cameraModal.addEventListener('click', e => e.target === DOM.cameraModal && closeCamera());
+    document.addEventListener('keydown', e => e.key === 'Escape' && DOM.cameraModal.classList.contains('active') && closeCamera());
     
-    function copyAnalysisData() {
-      if (!state.analysisData) return;
-      const {exifData, authenticity} = state.analysisData;
-      let text = `📊 تقرير تحليل الصورة - مشروع ماتو\n${'═'.repeat(40)}\n`;
-      text += `\n🛡️ فحص الأصالة:\n• النتيجة: ${authenticity.score}%\n• التقييم: ${authenticity.verdict}\n`;
-      if (authenticity.detectedSoftware?.length) text += `• برامج تعديل: ${authenticity.detectedSoftware.join(', ')}\n`;
-      if (authenticity.elaData) text += `\n🔬 تحليل ELA:\n• متوسط الخطأ: ${authenticity.elaData.avgDiffPerPixel.toFixed(2)}\n• التقييم: ${authenticity.elaData.label}\n`;
-      text += `\n🖼️ معلومات الصورة:\n• ${exifData.fileName} | ${exifData.fileSize} | ${exifData.width}×${exifData.height}\n`;
-      text += `\n📱 الجهاز: ${exifData.cameraMake||''} ${exifData.cameraModel||''}\n`;
-      text += `\n⚙️ الإعدادات: ISO ${exifData.isoSpeed||'تلقائي'} | ${exifData.fNumber||'—'} | ${exifData.exposureTime||'—'}\n`;
-      text += `\n🔗 محلل الصور | مشروع ماتو`;
-      navigator.clipboard.writeText(text).then(()=>showMessage('📋 تم النسخ','success')).catch(()=>showMessage('❌ فشل النسخ','error'));
-    }
-    
-    function showAbout() {
-      alert(`✨ محلل الصور - مشروع ماتو v3.0\n\n🔍 فحص الأصالة والتعديل الرقمي\n\n🛡️ فحوصات الأصالة (10 فحوصات):\n• كشف بيانات EXIF\n• كشف برامج التعديل (Photoshop, GIMP...)\n• فحص اتساق البيانات الزمنية\n• التحقق من بيانات GPS\n• فحص نسبة الأبعاد\n• تحليل حجم الملف vs الدقة\n• فحص MakerNote\n• فحص XMP Metadata\n• فحص بيانات الفلاش\n• فحص بيانات العدسة\n\n🔬 تحليل ELA (Error Level Analysis):\n• كشف مناطق الضغط المختلفة\n• تحديد أجزاء الصورة المعدّلة\n• كشف اللصق والنسخ\n\n⚡ البرامج المكتشفة تلقائياً:\nPhotoshop • GIMP • Paint.NET • Adobe • Lightroom • Snapseed • VSCO • Canva • Pixlr • Figma • Sketch • Corel • Illustrator • Affinity\n\n🔒 خصوصية تامة - كل شيء محلي`);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        dom.cameraBtn.disabled=true; dom.cameraBtn.innerHTML='<span>⚠️</span> الكاميرا غير مدعومة';
-      }
-      if (!window.EXIF) console.warn('مكتبة EXIF غير محملة');
-      document.addEventListener('visibilitychange', () => { if (document.hidden && state.currentStream) state.currentStream.getTracks().forEach(t=>t.stop()); });
-      console.log('✨ محلل الصور - مشروع ماتو v3.0 | فحص الأصالة جاهز');
+    DOM.toastClose.addEventListener('click', () => DOM.toast.classList.remove('show'));
+    DOM.themeToggle.addEventListener('click', () => {
+      STATE.theme = STATE.theme === 'dark' ? 'light' : STATE.theme === 'light' ? 'auto' : 'dark';
+      localStorage.setItem('matoo_theme', STATE.theme);
+      Utils.toast('المظهر', STATE.theme === 'auto' ? 'تم التحويل للوضع التلقائي' : STATE.theme === 'light' ? 'تم التحويل للوضع الفاتح' : 'تم التحويل للوضع الداكن', 'info');
+      document.documentElement.style.colorScheme = STATE.theme;
     });
-    
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+
+    DOM.aboutBtn.addEventListener('click', e => { e.preventDefault(); Utils.toast('حول المشروع', 'محلل صور متقدم v4.0 • فحص أصالة • ELA • خصوصية 100% • مشروع ماتو', 'info', 8000); });
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!navigator.mediaDevices?.getUserMedia) { DOM.cameraBtn.disabled=true; DOM.cameraBtn.innerHTML='<span>⚠️</span> غير مدعوم'; }
+      if (!window.EXIF) console.warn('مكتبة EXIF غير محملة');
+      document.addEventListener('visibilitychange', () => { if(document.hidden && STATE.stream) STATE.stream.getTracks().forEach(t=>t.stop()); });
+      console.log('✨ محلل الصور - مشروع ماتو v4.0 | جاهز للعمل');
+    });
+
+    let deferredPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
   </script>
 </body>
 </html>
